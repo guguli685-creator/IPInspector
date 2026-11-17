@@ -1,66 +1,65 @@
-# GeoPing
+# 🌐 GeoPing · IP Inspector
 
-一个纯前端节点地区与参考速度检测网页。
+**纯前端 · 零密钥 · 全维度公网 IP 归属与原生属性检测工具**
 
-GeoPing 用于检测当前 IP 出口地区、系统环境与节点参考速度，适合在切换 VPN、代理或机场节点后，快速确认当前网络出口是否连接到目标地区。
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Pure Frontend](https://img.shields.io/badge/Architecture-Pure%20Frontend-10b981.svg)](#)
+[![Zero Token](https://img.shields.io/badge/Security-Zero%20Token%20Exposed-f59e0b.svg)](#)
 
-## 功能
+[在线访问 (GitHub Pages)](https://guguli685-creator.github.io/geoping/) · [功能特性](#-核心功能) · [快速部署](#-部署方式)
 
-- 检测当前公网 IP
-- 显示节点所在国家和地区代码
-- 中文显示国家名称
-- 显示浏览器语言
-- 显示系统时区
-- 显示节点时区
-- 判断系统时区与节点时区是否接近
-- 进行参考测速
-  - 延迟 5 次采样，取中位数
-  - 下载 5MB × 2 轮，取平均速度
-- 可选显示 ASN、运营商或 ISP 信息
+</div>
 
-## 使用场景
+---
 
-- 切换节点后确认出口地区
-- 简单判断节点速度是否异常
-- 检查浏览器语言、系统时区与节点地区是否一致
-- 作为 GitHub Pages 静态网页工具使用
+## 📖 项目简介
 
-## 部署方式
+**GeoPing** 是一个基于现代极简设计规范（VitePress + Untitled UI 风格）构建的纯前端网络检测面板。无需任何后端服务器，也无需在代码中硬编码 API Token，可直接托管于 GitHub Pages 或 Cloudflare Pages。
 
-将 `index.html` 上传到 GitHub 仓库根目录，然后开启 GitHub Pages。
+适合在切换 VPN、代理节点或排查跨境网络环境时，快速核验出口 IP 的**地理归属、运营商原生属性（AS Type）、双栈连通性及隐私风控状态**。
 
-GitHub Pages 设置路径：
+---
 
-```text
-Settings → Pages → Deploy from a branch → main → /root → Save
-```
+## ✨ 核心功能
 
-部署完成后访问：
+### 1. 🔍 出口识别与任意 IP 检索
+- **自动检测与手动查询**：页面加载自动识别本机公网出口；支持在搜索框输入任意 **IPv4 / IPv6** 地址进行归属查询。
+- **双栈网络探测**：同步检测当前网络环境的 IPv4 与 IPv6 出口状态。
 
-```text
-https://guguli685-creator.github.io/geoping/
-```
+### 2. 🏷️ 运营商与原生属性研判（AS Type）
+- **核心网络类型标注**：自动分析并高亮区分以下网络属性：
+  - `ISP` — 原生家庭宽带 / 移动蜂窝运营商
+  - `Hosting` — 数据中心 / 云厂商机房节点
+  - `Education` — 高校 / 教育科研网络
+  - `Business` — 企业商业专线网络
+- **完整网络摘要（Summary）**：完整呈现 `ASN 编号`、`Company 所属机构`、`Range (CIDR 网段)`、`Hostname 反向解析`、`Privacy 代理特征`、`Anycast 任播状态` 及 `Abuse contact 投诉邮箱`。
 
-## 说明
+### 3. 🗺️ 无广告实时地图与环境一致性校验
+- **嵌入式 Google Maps**：内置纯净无广告的实时交互地图，自动定位至目标 IP 经纬度，支持一键跳转外部完整版地图。
+- **时区一致性对比**：自动比对节点所在时区与本地系统时区，提示是否匹配。
 
-GeoPing 是纯前端工具，不需要后端服务器。
+### 4. 🎨 现代交互与多端体验
+- **双端深度适配**：桌面端采用双栏卡片与四维指标速览布局；移动端自适应单栏折叠与全屏抽屉导航，优化触控体验。
+- **多语言与主题切换**：支持 **简体中文 / English / 日本語** 实时切换，内置 **亮色 / 暗色（Dark Mode）** 主题并自动记忆偏好。
+- **原始报文查看**：支持一键复制 IP 地址，提供可折叠的 `Raw JSON` 原始聚合接口报文面板。
 
-测速结果受浏览器、代理线路、Cloudflare 节点、移动网络策略和当前网络环境影响，只适合作为参考，不等同于专业测速软件结果。
+---
 
-ASN、运营商、ISP 等高级信息依赖公开接口，能获取时会自动显示，获取不到时会隐藏。
+## 🚀 部署方式
 
-## 项目定位
+本项目为单文件纯前端架构，无任何构建依赖，直接部署即可使用：
 
-GeoPing 专注于轻量检测：
+1. 将 `index.html` 上传至 GitHub 仓库根目录。
+2. 进入仓库的 **Settings** 页面，开启 GitHub Pages：
+   ```text
+   Settings → Pages → Build and deployment → Deploy from a branch → main → / (root) → Save
 
-```text
-出口地区
-系统环境
-参考速度
-```
+ * 等待约 1 分钟部署完成后，即可通过以下地址访问：
+   [https://guguli685-creator.github.io/geoping/](https://guguli685-creator.github.io/geoping/)
 
-它不做节点纯净度、VPN 识别、Proxy 识别、Tor 识别、滥用记录或账号风控判断。
+🛡️ 隐私与数据说明
+ * 零密钥安全设计：所有查询均通过浏览器端直接请求 ipinfo.io 公开免密钥接口及公共网络数据源进行聚合补全，不存在任何个人 API Token 泄露风险，可放心用于公开开源仓库。
+ * 数据参考性：IP 地理位置、网段划分及运营商分类依赖第三方公开数据库，不同平台的风控库判定可能存在细微差异，检测结果仅作网络环境排查参考。
+📄 License
+MIT License © guguli685-creator
 
-## License
-
-MIT
