@@ -2,691 +2,1822 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GeoPing · 节点地区与速度检测</title>
-  <meta name="description" content="检测当前 IP 出口地区、系统环境与节点参考速度。" />
-  <link rel="icon" href="./favicon.ico" sizes="any" />
-  <link rel="icon" type="image/png" href="./favicon.png" />
-  <link rel="apple-touch-icon" href="./favicon.png" />
-  <meta name="theme-color" content="#eef3fb" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>IP Inspector · 全维度网络与原生属性检测</title>
+  <meta name="description" content="现代网络与原生归属检测：展示 IPv4/IPv6、AS Type、网段 Range、隐私风控与无广告 Google 实时地图。" />
 
   <style>
+    /* VitePress + Untitled UI 亮色模式变量 */
     :root {
-      --bg: #f6f7fb;
-      --card: rgba(255, 255, 255, 0.78);
-      --text: #111827;
-      --muted: #6b7280;
-      --line: rgba(17, 24, 39, 0.08);
-      --blue: #2563eb;
-      --blue-soft: rgba(37, 99, 235, 0.1);
-      --green-text: #047857;
-      --green-soft: rgba(16, 185, 129, 0.12);
-      --yellow-text: #92400e;
-      --yellow-soft: rgba(245, 158, 11, 0.14);
-      --red-text: #b91c1c;
-      --red-soft: rgba(239, 68, 68, 0.13);
-      --gray-text: #475569;
-      --gray-soft: rgba(100, 116, 139, 0.12);
-      --shadow: 0 24px 80px rgba(15, 23, 42, 0.08);
-      --radius: 28px;
+      --vp-nav-height: 56px;
+      --bg-page: #f5f6f8;
+      --bg-card: #ffffff;
+      --bg-subtle: #f6f7f9;
+      --text-primary: #18191c;
+      --text-secondary: #475467;
+      --text-tertiary: #9499a0;
+      --border-light: #e3e5e7;
+      --border-medium: #d0d5dd;
+      
+      --brand-50: #eff8ff;
+      --brand-100: #d1e9ff;
+      --brand-200: #b2ddff;
+      --brand-600: #3b82f6;
+      --brand-700: #2563eb;
+
+      --success-50: #ecfdf3;
+      --success-200: #abefc6;
+      --success-700: #067647;
+
+      --warning-50: #fffaeb;
+      --warning-200: #fedf89;
+      --warning-700: #b54708;
+
+      --error-50: #fef3f2;
+      --error-200: #fecdca;
+      --error-700: #b42318;
+
+      --purple-50: #f4f3ff;
+      --purple-200: #d9d6fe;
+      --purple-700: #5925dc;
+
+      --shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.04);
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.03);
+      --shadow-lg: 0 12px 24px -4px rgba(16, 24, 40, 0.1), 0 4px 8px -2px rgba(16, 24, 40, 0.04);
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 14px;
     }
 
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+    /* 暗色模式变量 */
+    body.dark {
+      --bg-page: #0e0e10;
+      --bg-card: #1b1b1f;
+      --bg-subtle: rgba(255, 255, 255, 0.04);
+      --text-primary: rgba(255, 255, 255, 0.87);
+      --text-secondary: rgba(255, 255, 255, 0.68);
+      --text-tertiary: rgba(255, 255, 255, 0.5);
+      --border-light: rgba(255, 255, 255, 0.1);
+      --border-medium: rgba(255, 255, 255, 0.16);
+
+      --brand-50: rgba(59, 130, 246, 0.16);
+      --brand-100: rgba(59, 130, 246, 0.24);
+      --brand-200: rgba(96, 165, 250, 0.35);
+      --brand-600: #3b82f6;
+      --brand-700: #60a5fa;
+
+      --success-50: rgba(6, 118, 71, 0.2);
+      --success-200: rgba(71, 205, 137, 0.35);
+      --success-700: #47cd89;
+
+      --warning-50: rgba(181, 71, 8, 0.2);
+      --warning-200: rgba(253, 176, 34, 0.35);
+      --warning-700: #fdb022;
+
+      --error-50: rgba(180, 35, 24, 0.22);
+      --error-200: rgba(249, 112, 102, 0.35);
+      --error-700: #f97066;
+
+      --purple-50: rgba(89, 37, 220, 0.22);
+      --purple-200: rgba(158, 119, 237, 0.35);
+      --purple-700: #b692f6;
+
+      --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.35);
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+      --shadow-lg: 0 16px 28px -4px rgba(0, 0, 0, 0.65), 0 4px 10px -2px rgba(0, 0, 0, 0.45);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 2px; }
 
     body {
-      margin: 0;
       min-height: 100vh;
-      color: var(--text);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-      background:
-        radial-gradient(circle at 18% 10%, rgba(59, 130, 246, 0.14), transparent 32%),
-        radial-gradient(circle at 82% 18%, rgba(16, 185, 129, 0.12), transparent 28%),
-        linear-gradient(180deg, #fbfcff 0%, var(--bg) 100%);
+      background-color: var(--bg-page);
+      color: var(--text-primary);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans", "Yu Gothic", "Microsoft YaHei", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      transition: background-color 0.25s ease, color 0.25s ease;
+      padding-bottom: env(safe-area-inset-bottom);
     }
 
-    .page { width: min(1080px, calc(100% - 32px)); margin: 0 auto; padding: 46px 0 38px; }
-    .hero { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 24px; align-items: stretch; }
-
-    .panel {
-      position: relative;
-      overflow: hidden;
-      background: var(--card);
-      border: 1px solid rgba(255, 255, 255, 0.75);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(22px);
+    /* VitePress 极简风格固定顶部菜单栏 */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--vp-nav-height);
+      background-color: var(--bg-card);
+      border-bottom: 1px solid var(--border-light);
+      z-index: 1000;
+      transition: background-color 0.25s ease, border-color 0.25s ease;
     }
 
-    .main, .status-card, .speed-panel, .env-panel, .webrtc-panel, .advanced-panel { padding: 28px; }
-
-    .tag {
-      display: inline-flex;
+    .nav-container {
+      max-width: 1120px;
+      margin: 0 auto;
+      height: 100%;
+      padding: 0 16px;
+      display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 8px;
-      height: 34px;
-      padding: 0 13px;
-      border-radius: 999px;
-      background: var(--blue-soft);
-      color: var(--blue);
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.2px;
     }
 
-    .dot { width: 8px; height: 8px; border-radius: 999px; background: var(--blue); box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.12); }
-
-    h1 { margin: 24px 0 12px; font-size: clamp(48px, 8vw, 84px); line-height: 0.94; letter-spacing: -0.07em; }
-    .desc { margin: 0; max-width: 620px; color: var(--muted); font-size: 16px; line-height: 1.8; }
-    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
-
-    button {
-      appearance: none;
-      border: 0;
-      cursor: pointer;
-      height: 48px;
-      padding: 0 18px;
-      border-radius: 16px;
+    .nav-title {
+      display: flex;
+      align-items: center;
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      font-weight: 600;
       font-size: 15px;
-      font-weight: 750;
+      cursor: pointer;
+      gap: 8px;
+    }
+
+    .logo-box {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background-color: var(--brand-600);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      flex-shrink: 0;
+    }
+
+    .nav-right-group {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .nav-item {
+      background: none;
+      border: none;
+      color: var(--text-tertiary);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-item:hover, .nav-item.active {
+      color: var(--brand-600);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-icon-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-tertiary);
+      height: 32px;
+      padding: 0 8px;
+      border-radius: 6px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      transition: 0.2s ease;
-      white-space: nowrap;
-    }
-
-    button:disabled { cursor: not-allowed; opacity: 0.72; }
-    .primary { color: #fff; background: #111827; box-shadow: 0 12px 28px rgba(17, 24, 39, 0.18); }
-    .primary:hover:not(:disabled) { transform: translateY(-1px); background: #020617; }
-    .secondary { color: #111827; background: rgba(255, 255, 255, 0.78); border: 1px solid var(--line); box-shadow: 0 12px 28px rgba(15, 23, 42, 0.04); }
-    .secondary:hover:not(:disabled) { transform: translateY(-1px); background: #fff; }
-
-    .status-card { display: flex; flex-direction: column; justify-content: space-between; min-height: 320px; }
-    .status-top { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
-    .status-title, .section-title { color: var(--muted); font-size: 14px; font-weight: 700; }
-    .status-text { margin-top: 8px; color: var(--muted); font-size: 15px; line-height: 1.8; }
-
-    .pill {
-      height: 30px;
-      padding: 0 11px;
-      border-radius: 999px;
-      display: inline-flex;
-      align-items: center;
-      font-size: 12px;
-      font-weight: 800;
-      color: var(--green-text);
-      background: var(--green-soft);
-    }
-
-    .pill.idle { color: var(--gray-text); background: var(--gray-soft); }
-    .pill.failed { color: var(--red-text); background: var(--red-soft); }
-
-    .region { margin-top: 24px; }
-    .region-code { font-size: clamp(64px, 13vw, 118px); line-height: 0.9; letter-spacing: -0.08em; font-weight: 850; }
-    .region-name { margin-top: 10px; color: var(--muted); font-size: 16px; font-weight: 700; }
-
-    .stack { display: grid; grid-template-columns: 1fr; gap: 18px; margin-top: 18px; }
-    .score-row { margin-top: 10px; display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
-    .score { font-size: clamp(42px, 8vw, 72px); line-height: 0.95; letter-spacing: -0.06em; font-weight: 850; }
-
-    .score-label {
-      height: 34px;
-      padding: 0 13px;
-      border-radius: 999px;
-      display: inline-flex;
-      align-items: center;
+      gap: 5px;
       font-size: 13px;
-      font-weight: 850;
+      font-weight: 500;
+      cursor: pointer;
+      transition: color 0.2s, background-color 0.2s;
     }
 
-    .state-good { color: var(--green-text); background: var(--green-soft); }
-    .state-mid { color: var(--yellow-text); background: var(--yellow-soft); }
-    .state-bad { color: var(--red-text); background: var(--red-soft); }
-    .state-unknown { color: var(--gray-text); background: var(--gray-soft); }
-
-    .section-desc { margin-top: 12px; color: var(--muted); font-size: 14px; line-height: 1.8; }
-    .meter { height: 10px; width: 100%; border-radius: 999px; overflow: hidden; background: rgba(100, 116, 139, 0.14); margin-top: 18px; }
-    .meter-bar { height: 100%; width: 0%; border-radius: inherit; background: #111827; transition: width 0.35s ease; }
-
-    .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 18px; }
-
-    .item {
-      min-width: 0;
-      padding: 18px;
-      border-radius: 22px;
-      min-height: 112px;
-      border: 1px solid var(--line);
-      background: rgba(255, 255, 255, 0.66);
-      box-shadow: 0 12px 34px rgba(15, 23, 42, 0.035);
+    .nav-icon-btn:hover,
+    .nav-icon-btn[aria-expanded="true"] {
+      color: var(--text-primary);
+      background-color: var(--bg-subtle);
     }
 
-    .risk-card { border-width: 1px; }
-    .risk-good { border-color: rgba(16, 185, 129, 0.24); background: linear-gradient(180deg, rgba(16, 185, 129, 0.14), rgba(255, 255, 255, 0.72)); }
-    .risk-mid { border-color: rgba(245, 158, 11, 0.28); background: linear-gradient(180deg, rgba(245, 158, 11, 0.16), rgba(255, 255, 255, 0.72)); }
-    .risk-bad { border-color: rgba(239, 68, 68, 0.3); background: linear-gradient(180deg, rgba(239, 68, 68, 0.16), rgba(255, 255, 255, 0.72)); }
-    .risk-neutral { border-color: var(--line); background: rgba(255, 255, 255, 0.66); }
-    .risk-good .value { color: var(--green-text); }
-    .risk-mid .value { color: var(--yellow-text); }
-    .risk-bad .value { color: var(--red-text); }
+    .nav-icon-btn svg {
+      width: 17px;
+      height: 17px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
 
-    .label { color: var(--muted); font-size: 13px; font-weight: 750; }
-    .value { margin-top: 12px; font-size: clamp(14px, 1.8vw, 17px); font-weight: 850; line-height: 1.5; word-break: break-word; overflow-wrap: anywhere; white-space: normal; }
-    .wide { grid-column: span 2; }
-    .wide .value { font-size: 14px; font-weight: 750; line-height: 1.65; }
-    .full { grid-column: 1 / -1; }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size: 13px; font-weight: 700; color: #334155; }
+    .sun-icon { display: block; }
+    .moon-icon { display: none; }
+    body.dark .sun-icon { display: none; }
+    body.dark .moon-icon { display: block; }
 
-    .advanced-panel { display: none; }
-    .advanced-panel.show { display: block; }
+    /* 自定义语言下拉浮层 */
+    .dropdown {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+    }
 
-    .note { margin-top: 18px; padding: 18px 20px; border-radius: 22px; background: rgba(255, 255, 255, 0.58); border: 1px solid var(--line); color: var(--muted); font-size: 14px; line-height: 1.8; }
-    .footer { margin-top: 18px; color: var(--muted); font-size: 13px; text-align: center; line-height: 1.8; }
-    .footer a { color: #111827; font-weight: 800; text-decoration: none; border-bottom: 1px solid rgba(17, 24, 39, 0.22); }
-    .footer a:hover { border-bottom-color: #111827; }
-    .error { color: #ef4444; }
+    .dropdown-menu {
+      position: absolute;
+      right: 0;
+      top: calc(100% + 8px);
+      min-width: 156px;
+      padding: 6px;
+      border-radius: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      box-shadow: var(--shadow-lg);
+      z-index: 1100;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-6px) scale(0.98);
+      transform-origin: top right;
+      transition: opacity 0.16s ease, transform 0.16s ease, visibility 0.16s;
+    }
 
-    @media (max-width: 900px) {
-      .page { width: min(100% - 24px, 720px); padding: 18px 0 28px; }
-      .hero, .grid { grid-template-columns: 1fr; }
-      .main, .status-card, .speed-panel, .env-panel, .webrtc-panel, .advanced-panel { padding: 24px; }
-      h1 { margin-top: 20px; font-size: clamp(56px, 18vw, 78px); }
-      .desc { font-size: 15px; line-height: 1.85; }
-      .actions { flex-direction: column; }
-      button { width: 100%; }
-      .wide, .full { grid-column: span 1; }
+    .dropdown-menu.open {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+    }
+
+    .dropdown-item {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 10px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 500;
+      text-align: left;
+      cursor: pointer;
+      transition: background-color 0.12s ease, color 0.12s ease;
+    }
+
+    .dropdown-item:hover {
+      background: var(--bg-subtle);
+      color: var(--text-primary);
+    }
+
+    .dropdown-item.active {
+      background: var(--brand-50);
+      color: var(--brand-600);
+      font-weight: 600;
+    }
+
+    .check-icon {
+      color: var(--brand-600);
+      opacity: 0;
+      flex-shrink: 0;
+    }
+
+    .dropdown-item.active .check-icon {
+      opacity: 1;
+    }
+
+    /* 移动端汉堡按钮与全屏抽屉菜单 */
+    .hamburger {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-tertiary);
+    }
+
+    .hamburger span {
+      width: 16px;
+      height: 2px;
+      background-color: currentColor;
+      border-radius: 2px;
+    }
+
+    .mobile-screen {
+      position: fixed;
+      top: var(--vp-nav-height);
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--bg-card);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transform: translateX(100%);
+      transition: transform 0.3s ease-in-out;
+      z-index: 999;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .mobile-screen.open {
+      transform: translateX(0);
+    }
+
+    .screen-item {
+      background: none;
+      border: none;
+      border-bottom: 1px solid var(--border-light);
+      color: var(--text-primary);
+      font-size: 15px;
+      font-weight: 500;
+      text-align: left;
+      padding: 14px 4px;
+      cursor: pointer;
+      text-decoration: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .mobile-lang-section {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 12px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-light);
+    }
+
+    .mobile-lang-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      margin-bottom: 10px;
+    }
+
+    .mobile-lang-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .mobile-lang-btn {
+      height: 36px;
+      border-radius: 8px;
+      border: 1px solid var(--border-light);
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .mobile-lang-btn.active {
+      border-color: var(--brand-600);
+      background: var(--brand-50);
+      color: var(--brand-600);
+      font-weight: 600;
+    }
+
+    @media (max-width: 600px) {
+      .nav-menu { display: none; }
+      .desktop-lang { display: none; }
+      .hamburger { display: flex; }
+    }
+
+    /* 主容器 */
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: calc(var(--vp-nav-height) + 20px) 16px 48px;
+    }
+
+    /* 搜索工具栏 */
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      flex: 1;
+      min-width: 240px;
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      color: var(--text-tertiary);
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      height: 44px;
+      padding: 0 14px 0 40px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-light);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      font-size: 15px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      box-shadow: var(--shadow-xs);
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s, background-color 0.25s;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-tertiary);
+    }
+
+    .search-input:focus {
+      border-color: var(--brand-600);
+      box-shadow: 0 0 0 3px var(--brand-50);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      height: 44px;
+      padding: 0 18px;
+      border-radius: var(--radius-lg);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      border: 1px solid transparent;
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: var(--brand-600);
+      color: #ffffff;
+      box-shadow: var(--shadow-xs);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--brand-700);
+    }
+
+    .btn-secondary {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border-color: var(--border-light);
+      box-shadow: var(--shadow-xs);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: var(--bg-subtle);
+    }
+
+    /* 顶部核心概览卡片 */
+    .hero-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 18px;
+      transition: background-color 0.25s ease, border-color 0.25s ease;
+    }
+
+    .breadcrumb-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-tertiary);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .breadcrumb-sep {
+      opacity: 0.5;
+    }
+
+    .hero-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      flex-wrap: wrap;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .ip-display-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .ip-number {
+      font-size: clamp(26px, 4.5vw, 38px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      word-break: break-all;
+    }
+
+    .copy-btn {
+      padding: 6px 10px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-light);
+      background: var(--bg-subtle);
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s;
+    }
+
+    .copy-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--border-medium);
+    }
+
+    .ipv6-subline {
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--text-tertiary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    /* 徽章与重点 AS Type 突出展示 */
+    .badge-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid var(--border-light);
+      background: var(--bg-subtle);
+      color: var(--text-secondary);
+    }
+
+    .badge-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .badge-success {
+      background: var(--success-50);
+      border-color: var(--success-200);
+      color: var(--success-700);
+    }
+
+    .badge-warning {
+      background: var(--warning-50);
+      border-color: var(--warning-200);
+      color: var(--warning-700);
+    }
+
+    .badge-error {
+      background: var(--error-50);
+      border-color: var(--error-200);
+      color: var(--error-700);
+    }
+
+    .badge-brand {
+      background: var(--brand-50);
+      border-color: var(--brand-200);
+      color: var(--brand-700);
+    }
+
+    .badge-purple {
+      background: var(--purple-50);
+      border-color: var(--purple-200);
+      color: var(--purple-700);
+    }
+
+    /* 概览 4 指标速览 */
+    .hero-meta {
+      padding-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .meta-box {
+      padding: 14px 16px;
+      border-radius: var(--radius-lg);
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-light);
+      transition: background-color 0.25s ease, border-color 0.25s ease;
+    }
+
+    .meta-box.highlight-as {
+      background: var(--brand-50);
+      border-color: var(--brand-200);
+    }
+
+    .meta-block-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      margin-bottom: 6px;
+    }
+
+    .meta-box.highlight-as .meta-block-label {
+      color: var(--brand-700);
+    }
+
+    .meta-block-val {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    /* 主体双栏网格 */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-xl);
+      padding: 22px;
+      box-shadow: var(--shadow-sm);
+      transition: background-color 0.25s ease, border-color 0.25s ease;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .card-subtitle {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-tertiary);
+    }
+
+    /* Summary 完整行列表 */
+    .summary-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-light);
+      font-size: 14px;
+    }
+
+    .summary-row:last-child {
+      border-bottom: none;
+      padding-bottom: 2px;
+    }
+
+    .summary-row:first-child {
+      padding-top: 2px;
+    }
+
+    .summary-key {
+      color: var(--text-tertiary);
+      font-weight: 500;
+      flex-shrink: 0;
+      min-width: 115px;
+    }
+
+    .summary-val {
+      color: var(--text-primary);
+      font-weight: 600;
+      text-align: right;
+      word-break: break-word;
+      line-height: 1.5;
+    }
+
+    .summary-val.mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 13px;
+    }
+
+    .code-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-light);
+      color: var(--text-primary);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* 无广告完整 Google Maps 嵌入式容器 */
+    .map-wrapper {
+      width: 100%;
+      height: 310px;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      border: 1px solid var(--border-light);
+      margin-bottom: 16px;
+      position: relative;
+      background: var(--bg-subtle);
+    }
+
+    #googleMapFrame {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+      transition: filter 0.25s ease;
+    }
+
+    /* 暗色模式下对 Google 地图做柔和护眼色彩适配 */
+    body.dark #googleMapFrame {
+      filter: invert(90%) hue-rotate(180deg) brightness(95%) contrast(92%);
+    }
+
+    .map-link {
+      color: var(--brand-600);
+      text-decoration: none;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .map-link:hover {
+      text-decoration: underline;
+    }
+
+    /* 原始 JSON 折叠区 */
+    .raw-box {
+      margin-top: 18px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: background-color 0.25s ease, border-color 0.25s ease;
+    }
+
+    .raw-header {
+      padding: 15px 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .raw-header:hover {
+      background: var(--bg-subtle);
+    }
+
+    .raw-content {
+      display: none;
+      margin: 0;
+      padding: 18px 22px;
+      border-top: 1px solid var(--border-light);
+      background: #0e0e10;
+      color: #e4e7ec;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      overflow-x: auto;
+    }
+
+    .raw-content.open {
+      display: block;
+    }
+
+    .footer-note {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-tertiary);
+      line-height: 1.6;
+    }
+
+    /* 移动端响应式适配 */
+    @media (max-width: 840px) {
+      .container {
+        padding: calc(var(--vp-nav-height) + 14px) 14px 36px;
+      }
+
+      .toolbar {
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+
+      .search-input {
+        font-size: 16px;
+        height: 46px;
+      }
+
+      .btn-group {
+        width: 100%;
+      }
+
+      .btn {
+        flex: 1;
+        height: 44px;
+      }
+
+      .hero-card {
+        padding: 18px;
+        margin-bottom: 14px;
+      }
+
+      .hero-header {
+        padding-bottom: 16px;
+      }
+
+      .hero-meta {
+        padding-top: 16px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+
+      .main-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+
+      .card {
+        padding: 18px;
+      }
+
+      .map-wrapper {
+        height: 250px;
+      }
+
+      .summary-key {
+        min-width: 100px;
+        font-size: 13px;
+      }
+
+      .summary-val {
+        font-size: 13px;
+      }
+
+      .raw-header {
+        padding: 14px 18px;
+      }
+
+      .raw-content {
+        padding: 14px 18px;
+        font-size: 12px;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .hero-meta {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
-
 <body>
-  <main class="page">
-    <section class="hero">
-      <div class="panel main">
-        <div class="tag"><span class="dot"></span>Region · Speed · Environment</div>
-        <h1>GeoPing</h1>
-        <p class="desc">检测当前 IP 出口地区、系统环境与节点参考速度。测速使用 5 次延迟采样与 5MB × 2 轮下载测试。</p>
-        <div class="actions"><button id="detectBtn" class="primary" type="button" onclick="detectAll()">开始检测</button></div>
-      </div>
 
-      <div class="panel status-card">
-        <div class="status-top">
-          <div>
-            <div class="status-title">当前出口地区</div>
-            <div id="statusText" class="status-text">点击开始检测后获取当前出口地区</div>
+  <!-- VitePress 极简风格固定顶部菜单栏 -->
+  <header>
+    <div class="nav-container">
+      <button class="nav-title" onclick="location.reload()">
+        <div class="logo-box">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        </div>
+        <span>IP Inspector</span>
+      </button>
+
+      <div class="nav-right-group">
+        <nav class="nav-menu">
+          <button class="nav-item active" onclick="fetchMyIp()" data-i18n="navHome">首页</button>
+          <a class="nav-item" href="https://ipinfo.io/what-is-my-ip" target="_blank" rel="noopener noreferrer" data-i18n="officialLink">IPinfo 官网</a>
+        </nav>
+
+        <div class="nav-actions">
+          <!-- 桌面端自定义语言下拉 -->
+          <div class="dropdown desktop-lang" id="langDropdown">
+            <button type="button" class="nav-icon-btn" id="langTriggerBtn" aria-haspopup="listbox" aria-expanded="false" onclick="toggleLangMenu(event)" aria-label="Language">
+              <svg viewBox="0 0 24 24"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+              <span id="currentLangLabel">简体中文</span>
+            </button>
+
+            <div class="dropdown-menu" id="langMenu" role="listbox">
+              <button type="button" class="dropdown-item active" data-lang="zh" onclick="selectLanguage('zh')">
+                <span>简体中文</span>
+                <svg class="check-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </button>
+              <button type="button" class="dropdown-item" data-lang="en" onclick="selectLanguage('en')">
+                <span>English</span>
+                <svg class="check-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </button>
+              <button type="button" class="dropdown-item" data-lang="ja" onclick="selectLanguage('ja')">
+                <span>日本語</span>
+                <svg class="check-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              </button>
+            </div>
           </div>
-          <div id="statusPill" class="pill idle">Idle</div>
+
+          <!-- 主题切换按钮（太阳 / 月亮图标） -->
+          <button class="nav-icon-btn" onclick="toggleTheme()" aria-label="主题切换">
+            <svg class="sun-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41m12.02-12.02l-1.41 1.41"/></svg>
+            <svg class="moon-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </button>
+
+          <!-- 移动端汉堡菜单按钮 -->
+          <button class="hamburger" onclick="toggleMobileMenu()" aria-label="菜单">
+            <span></span><span></span><span></span>
+          </button>
         </div>
-        <div class="region">
-          <div id="regionCodeBig" class="region-code">--</div>
-          <div id="regionNameBig" class="region-name">等待开始</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 移动端全屏抽屉菜单 -->
+  <div class="mobile-screen" id="mobileScreen">
+    <button class="screen-item" onclick="closeMobileMenu(); fetchMyIp();" data-i18n="navHome">首页</button>
+    <a class="screen-item" href="https://ipinfo.io/what-is-my-ip" target="_blank" rel="noopener noreferrer" onclick="closeMobileMenu()">
+      <span data-i18n="officialLink">IPinfo 官网</span>
+      <span>↗</span>
+    </a>
+
+    <div class="mobile-lang-section">
+      <div class="mobile-lang-title" data-i18n="mobileLangTitle">界面语言 / Language</div>
+      <div class="mobile-lang-grid">
+        <button type="button" class="mobile-lang-btn active" data-lang="zh" onclick="selectLanguageMobile('zh')">简体中文</button>
+        <button type="button" class="mobile-lang-btn" data-lang="en" onclick="selectLanguageMobile('en')">English</button>
+        <button type="button" class="mobile-lang-btn" data-lang="ja" onclick="selectLanguageMobile('ja')">日本語</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="container">
+    <!-- 搜索与检测栏 -->
+    <div class="toolbar">
+      <div class="search-box">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="ipInput" class="search-input" placeholder="输入任意 IPv4 / IPv6 地址查询，留空检测本机..." inputmode="url" />
+      </div>
+      <div class="btn-group">
+        <button id="queryBtn" class="btn btn-primary" onclick="handleQuery()" data-i18n="btnQuery">查询 IP</button>
+        <button id="myIpBtn" class="btn btn-secondary" onclick="fetchMyIp()" data-i18n="btnMyIp">检测本机</button>
+      </div>
+    </div>
+
+    <!-- 顶部核心 IP 概览 -->
+    <section class="hero-card">
+      <div class="breadcrumb-bar">
+        <span>All IP Ranges</span>
+        <span class="breadcrumb-sep">&gt;</span>
+        <span>/8</span>
+        <span class="breadcrumb-sep">&gt;</span>
+        <span>/16</span>
+        <span class="breadcrumb-sep">&gt;</span>
+        <span>/24</span>
+        <span class="breadcrumb-sep">&gt;</span>
+        <span id="crumbIp">--</span>
+      </div>
+
+      <div class="hero-header">
+        <div>
+          <div class="ip-display-row">
+            <span id="ipValue" class="ip-number">--</span>
+            <button class="copy-btn" onclick="copyIp()" id="copyBtn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span id="copyBtnText" data-i18n="btnCopy">复制</span>
+            </button>
+          </div>
+          <div class="ipv6-subline">
+            <span>IPv6:</span>
+            <span id="ipv6Status">--</span>
+          </div>
+        </div>
+
+        <div class="badge-group">
+          <span id="asTypeHeroBadge" class="badge badge-brand"><span class="badge-dot"></span>AS Type: --</span>
+          <span id="statusBadge" class="badge badge-success"><span class="badge-dot"></span>Ready</span>
+        </div>
+      </div>
+
+      <div class="hero-meta">
+        <div class="meta-box highlight-as">
+          <div class="meta-block-label" data-i18n="metaAsType">AS Type (核心网络属性)</div>
+          <div id="heroAsType" class="meta-block-val">--</div>
+        </div>
+        <div class="meta-box">
+          <div class="meta-block-label" data-i18n="metaAsn">所属运营商 (ASN)</div>
+          <div id="heroAsnOrg" class="meta-block-val">--</div>
+        </div>
+        <div class="meta-box">
+          <div class="meta-block-label" data-i18n="metaLocation">地理位置 (Location)</div>
+          <div id="heroLocation" class="meta-block-val">--</div>
+        </div>
+        <div class="meta-box">
+          <div class="meta-block-label" data-i18n="metaPrivacy">隐私与任播 (Privacy / Anycast)</div>
+          <div id="heroPrivacyAnycast" class="meta-block-val">--</div>
         </div>
       </div>
     </section>
 
-    <section class="stack">
-      <div class="panel speed-panel">
-        <div class="section-title">节点速度</div>
-        <div class="score-row">
-          <div id="speedScore" class="score">--</div>
-          <div id="speedLabel" class="score-label state-unknown">等待测速</div>
-        </div>
-        <div id="speedDesc" class="section-desc">点击开始检测后测试响应延迟与参考下载速度。</div>
-        <div class="meter"><div id="speedMeter" class="meter-bar"></div></div>
+    <!-- 核心双栏：左侧完整 Summary 表格 + 右侧无广告 Google Maps 实时地图 -->
+    <section class="main-grid">
+      <!-- 左侧：完整 Summary 信息卡片 -->
+      <div class="card">
+        <h2 class="card-title">
+          <span data-i18n="cardSummaryTitle">Summary · 完整网络摘要</span>
+          <span class="card-subtitle" data-i18n="cardSummarySub">ipinfo.io 核心字段全显</span>
+        </h2>
 
-        <div class="grid">
-          <div class="item"><div class="label">响应延迟</div><div id="latency" class="value">--</div></div>
-          <div class="item"><div class="label">下载速度</div><div id="downloadSpeed" class="value">--</div></div>
-          <div class="item"><div class="label">测速耗时</div><div id="testDuration" class="value">--</div></div>
-          <div class="item"><div class="label">测试大小</div><div id="testSize" class="value">--</div></div>
-          <div class="item"><div class="label">测速节点</div><div id="speedNode" class="value">--</div></div>
-          <div class="item wide"><div class="label">测试方案</div><div id="testPlan" class="value">延迟 5 次取中位数，下载 5MB × 2 轮取平均</div></div>
+        <div class="summary-list">
+          <div class="summary-row">
+            <span class="summary-key">Location</span>
+            <span id="sumLocation" class="summary-val">--</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-key">ASN</span>
+            <span id="sumAsn" class="summary-val">--</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-key">AS Type</span>
+            <span id="sumAsType" class="summary-val">--</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-key">Hostname</span>
+            <span id="sumHostname" class="summary-val mono">—</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-key">Range (CIDR)</span>
+            <span id="sumRange" class="summary-val mono">--</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-key">Company</span>
+            <span id="sumCompany" class="summary-val">--</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-key">Hosted domains</span>
+            <span id="sumHostedDomains" class="summary-val mono">0</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-key">Privacy</span>
+            <span id="sumPrivacy" class="summary-val mono">--</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-key">Anycast</span>
+            <span id="sumAnycast" class="summary-val mono">--</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-key">Abuse contact</span>
+            <span id="sumAbuse" class="summary-val mono">--</span>
+          </div>
         </div>
       </div>
 
-      <div class="panel env-panel">
-        <div class="section-title">基础环境</div>
-        <div class="grid">
-          <div class="item"><div class="label">IP 地址</div><div id="ip" class="value">等待检测</div></div>
-          <div class="item"><div class="label">节点所在国家</div><div id="countryZh" class="value">等待检测</div></div>
-          <div class="item"><div class="label">节点地区代码</div><div id="countryCode" class="value">等待检测</div></div>
-          <div class="item"><div class="label">节点城市</div><div id="city" class="value">等待检测</div></div>
-          <div class="item"><div class="label">浏览器语言</div><div id="language" class="value">--</div></div>
-          <div class="item"><div class="label">系统时区</div><div id="systemTimezone" class="value">--</div></div>
-          <div class="item"><div class="label">节点时区</div><div id="nodeTimezone" class="value">等待检测</div></div>
-          <div class="item"><div class="label">地区一致性</div><div id="timezoneMatch" class="value">等待检测</div></div>
-        </div>
-      </div>
+      <!-- 右侧：Google Maps 完整无广告地图与详细地理信息 -->
+      <div class="card">
+        <h2 class="card-title">
+          <span data-i18n="cardGeoTitle">Google Maps · 实时地图定位</span>
+          <a id="externalMapLink" class="map-link" href="https://www.google.com/maps/@37.35411,-121.95524,10z?hl=zh-CN" target="_blank" rel="noopener noreferrer" style="font-size: 13px;" data-i18n="externalMap">打开 Google 地图 ↗</a>
+        </h2>
 
-      <div class="panel webrtc-panel">
-        <div class="section-title">WebRTC 检测</div>
-        <div id="webrtcDesc" class="section-desc">辅助检测浏览器 WebRTC 是否暴露本地网络候选信息。此检测不会自动运行，需要手动点击。</div>
-        <div class="actions"><button id="webrtcBtn" class="secondary" type="button" onclick="runWebRTCCheck()">检测 WebRTC</button></div>
-        <div class="grid">
-          <div class="item"><div class="label">WebRTC 状态</div><div id="webrtcStatus" class="value">等待检测</div></div>
-          <div class="item"><div class="label">候选数量</div><div id="webrtcCount" class="value">--</div></div>
-          <div id="webrtcRiskCard" class="item wide risk-card risk-neutral"><div class="label">风险提示</div><div id="webrtcLeak" class="value">等待检测</div></div>
-          <div class="item full"><div class="label">候选信息</div><div id="webrtcCandidates" class="value mono">等待检测</div></div>
+        <div class="map-wrapper">
+          <iframe
+            id="googleMapFrame"
+            src="https://maps.google.com/maps?q=37.35411,-121.95524&hl=zh-CN&z=11&output=embed"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            allowfullscreen
+            title="Google Maps Location"
+          ></iframe>
         </div>
-      </div>
 
-      <div id="advancedPanel" class="panel advanced-panel">
-        <div class="section-title">可选高级信息</div>
-        <div class="grid">
-          <div class="item"><div class="label">ASN</div><div id="asn" class="value">--</div></div>
-          <div class="item wide"><div class="label">运营商 / 组织</div><div id="org" class="value">--</div></div>
-          <div class="item"><div class="label">ISP</div><div id="isp" class="value">--</div></div>
+        <div class="summary-list">
+          <div class="summary-row">
+            <span class="summary-key" data-i18n="geoCountryLabel">国家 / 地区</span>
+            <span id="geoCountry" class="summary-val">--</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-key" data-i18n="geoRegionLabel">省 / 州 (Region)</span>
+            <span id="geoRegion" class="summary-val">--</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-key" data-i18n="geoCityLabel">城市 (City)</span>
+            <span id="geoCity" class="summary-val">--</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-key" data-i18n="geoCoordsLabel">地理坐标 (Lat, Lng)</span>
+            <span id="geoCoords" class="summary-val mono">--</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-key" data-i18n="geoPostalLabel">邮政编码 (Postal)</span>
+            <span id="geoPostal" class="summary-val mono">--</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-key" data-i18n="geoTzLabel">节点时区 / 本地对比</span>
+            <span id="geoTimezone" class="summary-val">--</span>
+          </div>
         </div>
       </div>
     </section>
 
-    <div class="note">GeoPing 只做轻量检测：当前公网出口地区、系统环境、WebRTC 候选信息与参考速度。测速结果受浏览器、Cloudflare 节点、代理线路、移动网络策略影响，只适合做节点横向对比。</div>
+    <!-- 原始合并数据 JSON 折叠区 -->
+    <section class="raw-box">
+      <div class="raw-header" onclick="toggleRaw()">
+        <span data-i18n="rawHeader">查看完整接口响应报文 (Raw JSON)</span>
+        <span id="rawToggleText" data-i18n="rawExpand">展开</span>
+      </div>
+      <pre id="rawJson" class="raw-content">{}</pre>
+    </section>
 
-    <div class="footer">
-      GeoPing · Pure Frontend · GitHub Pages Ready<br />
-      Source: <a href="https://github.com/guguli685-creator/geoping" target="_blank" rel="noopener noreferrer">github.com/guguli685-creator/geoping</a>
+    <div class="footer-note" data-i18n="footerNote">
+      纯前端开源实现 · 直接基于 ipinfo.io 公开端点与无广告 Google Maps 嵌入 · 零 Token 暴露风险
     </div>
   </main>
 
   <script>
     const $ = (id) => document.getElementById(id);
-    const EMPTY = "未获取";
-    const SPEED_CONFIG = { latencySamples: 5, downloadBytes: 5 * 1024 * 1024, downloadRounds: 2, latencyTimeoutMs: 5000, downloadTimeoutMs: 18000 };
-    let currentRegionData = null;
 
-    function initPage() { setIdle(); setBasicInfo(); setSpeedIdle(); setWebRTCIdle(); }
-    function setBasicInfo() { $("language").textContent = navigator.language || EMPTY; $("systemTimezone").textContent = Intl.DateTimeFormat().resolvedOptions().timeZone || EMPTY; }
-    function setIdle() { $("statusText").textContent = "点击开始检测后获取当前出口地区"; $("statusText").classList.remove("error"); $("statusPill").textContent = "Idle"; $("statusPill").className = "pill idle"; $("regionCodeBig").textContent = "--"; $("regionNameBig").textContent = "等待开始"; }
-
-    function setLoading() {
-      $("statusText").textContent = "正在检测出口地区与速度...";
-      $("statusText").classList.remove("error");
-      $("statusPill").textContent = "Checking";
-      $("statusPill").className = "pill";
-      $("regionCodeBig").textContent = "--";
-      $("regionNameBig").textContent = "检测中";
-      ["ip", "countryZh", "countryCode", "city", "nodeTimezone", "timezoneMatch"].forEach((id) => { $(id).textContent = "检测中"; });
-      $("advancedPanel").classList.remove("show");
-    }
-
-    function setResult(data) {
-      currentRegionData = data;
-      const code = String(data.country || "").toUpperCase();
-      const countryZh = code ? getCountryNameZh(code) : EMPTY;
-      $("statusText").textContent = "检测完成";
-      $("statusText").classList.remove("error");
-      $("statusPill").textContent = "Ready";
-      $("statusPill").className = "pill";
-      $("regionCodeBig").textContent = code || "--";
-      $("regionNameBig").textContent = code ? `${countryZh} · ${code}` : EMPTY;
-      $("ip").textContent = data.ip || EMPTY;
-      $("countryZh").textContent = countryZh;
-      $("countryCode").textContent = code || EMPTY;
-      $("city").textContent = data.city || EMPTY;
-      $("nodeTimezone").textContent = data.nodeTimezone || EMPTY;
-      $("timezoneMatch").textContent = getTimezoneMatchText(data.nodeTimezone);
-      showAdvancedIfAvailable(data);
-    }
-
-    function setError() {
-      currentRegionData = null;
-      $("statusText").textContent = "检测失败，请检查网络或稍后重试";
-      $("statusText").classList.add("error");
-      $("statusPill").textContent = "Failed";
-      $("statusPill").className = "pill failed";
-      $("regionCodeBig").textContent = "--";
-      $("regionNameBig").textContent = "无法获取地区";
-      ["ip", "countryZh", "countryCode", "city", "nodeTimezone", "timezoneMatch"].forEach((id) => { $(id).textContent = EMPTY; });
-    }
-
-    function showAdvancedIfAvailable(data) {
-      const hasAsn = Boolean(data.asn), hasOrg = Boolean(data.org), hasIsp = Boolean(data.isp);
-      if (!hasAsn && !hasOrg && !hasIsp) { $("advancedPanel").classList.remove("show"); return; }
-      $("advancedPanel").classList.add("show");
-      $("asn").textContent = data.asn || EMPTY;
-      $("org").textContent = data.org || EMPTY;
-      $("isp").textContent = data.isp || EMPTY;
-    }
-
-    function getCountryNameZh(code) {
-      try { return new Intl.DisplayNames(["zh-CN"], { type: "region" }).of(code) || code; }
-      catch { return { US: "美国", JP: "日本", HK: "中国香港", TW: "中国台湾", SG: "新加坡", KR: "韩国", CN: "中国", MO: "中国澳门", GB: "英国", DE: "德国", FR: "法国", CA: "加拿大", AU: "澳大利亚", MY: "马来西亚", TH: "泰国", VN: "越南", PH: "菲律宾", ID: "印度尼西亚", IN: "印度", RU: "俄罗斯" }[code] || code; }
-    }
-
-    function getTimezoneMatchText(nodeTimezone) {
-      const systemTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
-      if (!nodeTimezone || !systemTimezone) return EMPTY;
-      if (nodeTimezone === systemTimezone) return "时区完全一致";
-      return systemTimezone.split("/")[0] === nodeTimezone.split("/")[0] ? "时区区域接近" : "时区不一致";
-    }
-
-    function parseAsn(value) {
-      if (!value) return "";
-      const text = String(value);
-      const match = text.match(/AS\s?(\d+)/i);
-      if (match) return `AS${match[1]}`;
-      const digits = text.replace(/[^\d]/g, "");
-      return digits ? `AS${digits}` : "";
-    }
-
-    function mergeData(base, next) {
-      if (!next) return base;
-      base.ip = base.ip || next.ip || "";
-      base.country = base.country || next.country || "";
-      base.city = base.city || next.city || "";
-      base.nodeTimezone = base.nodeTimezone || next.nodeTimezone || "";
-      base.asn = base.asn || next.asn || "";
-      base.org = base.org || next.org || "";
-      base.isp = base.isp || next.isp || "";
-      return base;
-    }
-
-    async function requestJson(url) {
-      const response = await fetch(url, { method: "GET", cache: "no-store" });
-      if (!response.ok) throw new Error("Request failed");
-      return response.json();
-    }
-
-    async function getRegionData() {
-      const data = { ip: "", country: "", city: "", nodeTimezone: "", asn: "", org: "", isp: "" };
-      const tasks = [
-        async () => { const res = await requestJson(`https://api.country.is/?_=${Date.now()}`); return { ip: res.ip || "", country: String(res.country || "").toUpperCase() }; },
-        async () => { const res = await requestJson(`https://ipapi.co/json/?_=${Date.now()}`); return { ip: res.ip || "", country: String(res.country_code || "").toUpperCase(), city: res.city || "", nodeTimezone: res.timezone || "", asn: parseAsn(res.asn || ""), org: res.org || "", isp: "" }; },
-        async () => { const res = await requestJson(`https://ipwho.is/?_=${Date.now()}`); if (res.success === false) throw new Error("ipwho failed"); const connection = res.connection || {}; const timezone = res.timezone || {}; return { ip: res.ip || "", country: String(res.country_code || "").toUpperCase(), city: res.city || "", nodeTimezone: timezone.id || "", asn: parseAsn(connection.asn || ""), org: connection.org || "", isp: connection.isp || "" }; }
-      ];
-      const results = await Promise.allSettled(tasks.map((task) => task()));
-      results.forEach((item) => { if (item.status === "fulfilled") mergeData(data, item.value); });
-      if (!data.ip && !data.country) throw new Error("No region data");
-      return data;
-    }
-
-    function fetchWithTimeout(url, options = {}, timeoutMs = 8000) {
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), timeoutMs);
-      return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(timer));
-    }
-
-    function median(values) {
-      if (!values.length) return null;
-      const sorted = [...values].sort((a, b) => a - b);
-      const mid = Math.floor(sorted.length / 2);
-      return sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
-    }
-
-    async function measureLatency() {
-      const targets = [
-        { url: "https://www.gstatic.com/generate_204", mode: "no-cors" },
-        { url: "https://api.country.is/", mode: "cors" },
-        { url: "https://ipapi.co/json/", mode: "cors" }
-      ];
-      const samples = [];
-      for (let i = 0; i < SPEED_CONFIG.latencySamples; i += 1) {
-        const target = targets[i % targets.length];
-        try {
-          const start = performance.now();
-          await fetchWithTimeout(`${target.url}?_=${Date.now()}_${Math.random()}`, { method: "GET", cache: "no-store", mode: target.mode }, SPEED_CONFIG.latencyTimeoutMs);
-          samples.push(performance.now() - start);
-        } catch { }
+    // 多语言字典 (简体中文 / English / 日本語)
+    const I18N = {
+      zh: {
+        langName: "简体中文",
+        localeCode: "zh-CN",
+        mapHl: "zh-CN",
+        navHome: "首页",
+        officialLink: "IPinfo 官网",
+        mobileLangTitle: "界面语言 / Language",
+        searchPlaceholder: "输入任意 IPv4 / IPv6 地址查询，留空检测本机...",
+        btnQuery: "查询 IP",
+        btnMyIp: "检测本机",
+        btnCopy: "复制",
+        btnCopied: "已复制",
+        detecting: "正在检测...",
+        requesting: "请求中",
+        identifying: "识别中",
+        ready: "检测完成",
+        errorBadge: "异常",
+        queryFailed: "查询失败",
+        notDetected: "Not detected (仅 IPv4 出口)",
+        ipv4Target: "查询目标为 IPv4 地址",
+        metaAsType: "AS Type (核心网络属性)",
+        metaAsn: "所属运营商 (ASN)",
+        metaLocation: "地理位置 (Location)",
+        metaPrivacy: "隐私与任播 (Privacy / Anycast)",
+        cardSummaryTitle: "Summary · 完整网络摘要",
+        cardSummarySub: "ipinfo.io 核心字段全显",
+        cardGeoTitle: "Google Maps · 实时地图定位",
+        externalMap: "打开 Google 地图 ↗",
+        geoCountryLabel: "国家 / 地区",
+        geoRegionLabel: "省 / 州 (Region)",
+        geoCityLabel: "城市 (City)",
+        geoCoordsLabel: "地理坐标 (Lat, Lng)",
+        geoPostalLabel: "邮政编码 (Postal)",
+        geoTzLabel: "节点时区 / 本地对比",
+        tzMatch: "(与系统一致)",
+        tzDiff: "(与系统不同)",
+        privacyTrue: "true (检测到代理/VPN特征)",
+        privacyFalse: "false (纯净直连特征)",
+        anycastTrue: "true (Anycast 任播)",
+        asHosting: "Hosting · 数据中心/机房",
+        asEdu: "Education · 教育科研网",
+        asIsp: "ISP · 原生家宽/移动运营商",
+        asBusiness: "Business · 企业商业网络",
+        asDefault: "ISP · 常规电信/商业网络",
+        rawHeader: "查看完整接口响应报文 (Raw JSON)",
+        rawExpand: "展开",
+        rawCollapse: "收起",
+        footerNote: "纯前端开源实现 · 直接基于 ipinfo.io 公开端点与无广告 Google Maps 嵌入 · 零 Token 暴露风险",
+        errConnect: "无法连接 ipinfo.io 接口，请检查网络或代理"
+      },
+      en: {
+        langName: "English",
+        localeCode: "en-US",
+        mapHl: "en",
+        navHome: "Home",
+        officialLink: "IPinfo Official",
+        mobileLangTitle: "Language",
+        searchPlaceholder: "Enter IPv4 / IPv6 address, or leave blank for your IP...",
+        btnQuery: "Lookup IP",
+        btnMyIp: "My IP",
+        btnCopy: "Copy",
+        btnCopied: "Copied",
+        detecting: "Detecting...",
+        requesting: "Loading",
+        identifying: "Analyzing",
+        ready: "Ready",
+        errorBadge: "Error",
+        queryFailed: "Failed",
+        notDetected: "Not detected (IPv4 only)",
+        ipv4Target: "Target is an IPv4 address",
+        metaAsType: "AS Type (Network Classification)",
+        metaAsn: "Operator / ASN",
+        metaLocation: "Location",
+        metaPrivacy: "Privacy / Anycast",
+        cardSummaryTitle: "Summary · Network Details",
+        cardSummarySub: "Full ipinfo.io attributes",
+        cardGeoTitle: "Google Maps · Live Location",
+        externalMap: "Open Google Maps ↗",
+        geoCountryLabel: "Country / Region",
+        geoRegionLabel: "State / Region",
+        geoCityLabel: "City",
+        geoCoordsLabel: "Coordinates (Lat, Lng)",
+        geoPostalLabel: "Postal Code",
+        geoTzLabel: "Timezone / System Check",
+        tzMatch: "(Matches system)",
+        tzDiff: "(Differs from system)",
+        privacyTrue: "true (VPN / Proxy / Hosting detected)",
+        privacyFalse: "false (Clean residential/direct)",
+        anycastTrue: "true (Anycast routed)",
+        asHosting: "Hosting · Datacenter / Cloud",
+        asEdu: "Education · Academic Network",
+        asIsp: "ISP · Native Residential / Mobile",
+        asBusiness: "Business · Enterprise Network",
+        asDefault: "ISP · Standard Telecom / Business",
+        rawHeader: "View Raw Response Payload (JSON)",
+        rawExpand: "Expand",
+        rawCollapse: "Collapse",
+        footerNote: "Pure Frontend Open Source · Powered by ipinfo.io & Ad-free Google Maps · Zero Token exposure",
+        errConnect: "Unable to reach ipinfo.io API. Check your network or proxy."
+      },
+      ja: {
+        langName: "日本語",
+        localeCode: "ja-JP",
+        mapHl: "ja",
+        navHome: "ホーム",
+        officialLink: "IPinfo 公式サイト",
+        mobileLangTitle: "表示言語 / Language",
+        searchPlaceholder: "IPv4 / IPv6 アドレスを入力（空欄で現在のIPを検出）...",
+        btnQuery: "IP 検索",
+        btnMyIp: "現在の IP",
+        btnCopy: "コピー",
+        btnCopied: "完了",
+        detecting: "検出中...",
+        requesting: "通信中",
+        identifying: "判定中",
+        ready: "完了",
+        errorBadge: "エラー",
+        queryFailed: "取得失敗",
+        notDetected: "Not detected (IPv4 のみ)",
+        ipv4Target: "検索対象は IPv4 アドレスです",
+        metaAsType: "AS Type (ネットワーク種別)",
+        metaAsn: "通信事業者 (ASN)",
+        metaLocation: "所在地 (Location)",
+        metaPrivacy: "プライバシー / Anycast",
+        cardSummaryTitle: "Summary · ネットワーク概要",
+        cardSummarySub: "ipinfo.io 全項目表示",
+        cardGeoTitle: "Google Maps · リアルタイム地図",
+        externalMap: "Google マップを開く ↗",
+        geoCountryLabel: "国 / 地域",
+        geoRegionLabel: "都道府県 / 州 (Region)",
+        geoCityLabel: "市区町村 (City)",
+        geoCoordsLabel: "緯度・経度 (Lat, Lng)",
+        geoPostalLabel: "郵便番号 (Postal)",
+        geoTzLabel: "タイムゾーン / 端末比較",
+        tzMatch: "(端末と一致)",
+        tzDiff: "(端末と不一致)",
+        privacyTrue: "true (VPN / プロキシ / DC検出)",
+        privacyFalse: "false (クリーンな接続)",
+        anycastTrue: "true (Anycast 経路)",
+        asHosting: "Hosting · データセンター / クラウド",
+        asEdu: "Education · 教育・学術機関",
+        asIsp: "ISP · ネイティブ回線 / モバイル通信",
+        asBusiness: "Business · 法人向け回線",
+        asDefault: "ISP · 一般通信事業者 / 法人",
+        rawHeader: "生のレスポンスデータを表示 (Raw JSON)",
+        rawExpand: "展開",
+        rawCollapse: "閉じる",
+        footerNote: "ピュアフロントエンド実装 · ipinfo.io & 広告なし Google Maps · トークン漏洩リスクゼロ",
+        errConnect: "ipinfo.io に接続できませんでした。ネットワークやプロキシを確認してください。"
       }
-      const value = median(samples);
-      return value === null ? null : { medianMs: Math.round(value), samples: samples.map((item) => Math.round(item)) };
+    };
+
+    let currentLang = "zh";
+    let currentTheme = "light";
+    let currentIp = "";
+    let currentCoords = { lat: 37.35411, lng: -121.95524 };
+    let lastMergedData = null;
+    let lastRawPayload = null;
+    let lastIsCustom = false;
+    let lastIpv6State = { type: "loading", ip: "" };
+
+    function t(key) {
+      return (I18N[currentLang] && I18N[currentLang][key]) || I18N.zh[key] || key;
     }
 
-    async function measureDownload() {
-      const rounds = [];
-      let totalBytes = 0;
-      let totalSeconds = 0;
-      for (let i = 0; i < SPEED_CONFIG.downloadRounds; i += 1) {
-        const url = `https://speed.cloudflare.com/__down?bytes=${SPEED_CONFIG.downloadBytes}&_=${Date.now()}_${Math.random()}_${i}`;
-        const start = performance.now();
-        const response = await fetchWithTimeout(url, { method: "GET", cache: "no-store" }, SPEED_CONFIG.downloadTimeoutMs);
-        if (!response.ok) throw new Error("Speed download failed");
-        const blob = await response.blob();
-        const seconds = Math.max((performance.now() - start) / 1000, 0.001);
-        const size = blob.size || SPEED_CONFIG.downloadBytes;
-        const mbps = (size * 8) / seconds / 1000 / 1000;
-        totalBytes += size;
-        totalSeconds += seconds;
-        rounds.push({ bytes: size, seconds, mbps });
+    // 更新无广告完整 Google Maps iframe 与外部直达链接
+    function updateGoogleMap(lat, lng) {
+      const validLat = Number.isFinite(lat) ? lat : 37.35411;
+      const validLng = Number.isFinite(lng) ? lng : -121.95524;
+      currentCoords = { lat: validLat, lng: validLng };
+
+      const hl = t("mapHl");
+      // 嵌入式无广告完整 Google 地图地址
+      const embedUrl = `https://maps.google.com/maps?q=${validLat},${validLng}&hl=${hl}&z=11&output=embed`;
+      // 用户指定的标准 Google 地图网页版跳转格式
+      const externalUrl = `https://www.google.com/maps/@${validLat},${validLng},10z?hl=${hl}`;
+
+      const frame = $("googleMapFrame");
+      if (frame && frame.src !== embedUrl) {
+        frame.src = embedUrl;
       }
-      return { rounds, averageMbps: rounds.reduce((sum, item) => sum + item.mbps, 0) / rounds.length, totalBytes, totalSeconds };
-    }
-
-    async function runSpeedTest() {
-      const totalStart = performance.now();
-      const latency = await measureLatency().catch(() => null);
-      const download = await measureDownload().catch(() => null);
-      if (latency === null && !download) throw new Error("Speed test failed");
-      return { latency, download, durationSeconds: Math.max((performance.now() - totalStart) / 1000, 0.001) };
-    }
-
-    function setSpeedIdle() {
-      $("speedScore").textContent = "--";
-      $("speedLabel").textContent = "等待测速";
-      $("speedLabel").className = "score-label state-unknown";
-      $("speedDesc").textContent = "点击开始检测后测试响应延迟与参考下载速度。";
-      $("speedMeter").style.width = "0%";
-      $("latency").textContent = "--";
-      $("downloadSpeed").textContent = "--";
-      $("testDuration").textContent = "--";
-      $("testSize").textContent = "--";
-      $("speedNode").textContent = "--";
-      $("testPlan").textContent = "延迟 5 次取中位数，下载 5MB × 2 轮取平均";
-    }
-
-    function setSpeedLoading() {
-      $("speedScore").textContent = "--";
-      $("speedLabel").textContent = "测速中";
-      $("speedLabel").className = "score-label state-unknown";
-      $("speedDesc").textContent = "正在执行 5 次延迟采样与 2 轮下载测试。";
-      $("speedMeter").style.width = "18%";
-      $("latency").textContent = "--";
-      $("downloadSpeed").textContent = "--";
-      $("testDuration").textContent = "测试中";
-      $("testSize").textContent = `${formatBytes(SPEED_CONFIG.downloadBytes)} × ${SPEED_CONFIG.downloadRounds}`;
-      $("speedNode").textContent = "Cloudflare Speed";
-      $("testPlan").textContent = "延迟 5 次取中位数，下载 5MB × 2 轮取平均";
-    }
-
-    function updateSpeed(result) {
-      const latencyMs = result.latency ? result.latency.medianMs : null;
-      const mbps = result.download ? result.download.averageMbps : null;
-      let score = 100;
-      const reasons = [];
-      if (latencyMs === null) { score -= 20; reasons.push("响应延迟测试失败"); }
-      else if (latencyMs > 350) { score -= 40; reasons.push("响应延迟较高"); }
-      else if (latencyMs > 180) { score -= 24; reasons.push("响应延迟中等"); }
-      else if (latencyMs > 90) { score -= 10; reasons.push("响应延迟略高"); }
-      if (mbps === null) { score -= 28; reasons.push("下载测速失败"); }
-      else if (mbps < 2) { score -= 48; reasons.push("下载速度较慢"); }
-      else if (mbps < 8) { score -= 28; reasons.push("下载速度中等"); }
-      else if (mbps < 20) { score -= 12; reasons.push("下载速度尚可"); }
-      score = Math.max(0, Math.min(100, Math.round(score)));
-      let label = "速度较好", cls = "state-good", desc = "响应延迟与参考下载速度表现较好。";
-      if (score < 45) { label = "速度较慢"; cls = "state-bad"; desc = "当前节点速度表现较弱。"; }
-      else if (score < 75) { label = "速度中等"; cls = "state-mid"; desc = "当前节点速度可用，但存在延迟或下载速度限制。"; }
-      $("speedScore").textContent = `${score}`;
-      $("speedLabel").textContent = label;
-      $("speedLabel").className = `score-label ${cls}`;
-      $("speedDesc").textContent = reasons.length ? reasons.join("；") : desc;
-      $("speedMeter").style.width = `${score}%`;
-      $("latency").textContent = latencyMs === null ? EMPTY : `${latencyMs} ms`;
-      $("downloadSpeed").textContent = mbps === null ? EMPTY : `${mbps.toFixed(2)} Mbps`;
-      $("testDuration").textContent = `${result.durationSeconds.toFixed(1)} 秒`;
-      $("testSize").textContent = result.download ? `${formatBytes(result.download.totalBytes)} 总量` : EMPTY;
-      $("speedNode").textContent = "Cloudflare Speed";
-      const latencySamples = result.latency && result.latency.samples.length ? `延迟样本：${result.latency.samples.join(" / ")} ms` : "延迟样本：未获取";
-      $("testPlan").textContent = `${latencySamples}；下载 ${formatBytes(SPEED_CONFIG.downloadBytes)} × ${SPEED_CONFIG.downloadRounds} 轮取平均`;
-    }
-
-    function setSpeedError() {
-      $("speedScore").textContent = "--";
-      $("speedLabel").textContent = "测速失败";
-      $("speedLabel").className = "score-label state-unknown";
-      $("speedDesc").textContent = "测速接口不可用，或被浏览器、网络策略拦截。";
-      $("speedMeter").style.width = "0%";
-      ["latency", "downloadSpeed", "testDuration", "testSize", "speedNode"].forEach((id) => { $(id).textContent = EMPTY; });
-      $("testPlan").textContent = "测速失败";
-    }
-
-    function formatBytes(bytes) {
-      if (!bytes || bytes <= 0) return "--";
-      const units = ["B", "KB", "MB", "GB"];
-      let size = bytes, index = 0;
-      while (size >= 1024 && index < units.length - 1) { size /= 1024; index += 1; }
-      return `${size.toFixed(index === 0 ? 0 : 2)} ${units[index]}`;
-    }
-
-    function setWebRTCIdle() {
-      $("webrtcStatus").textContent = "等待检测";
-      $("webrtcCount").textContent = "--";
-      $("webrtcLeak").textContent = "等待检测";
-      $("webrtcCandidates").textContent = "等待检测";
-      $("webrtcDesc").textContent = "辅助检测浏览器 WebRTC 是否暴露本地网络候选信息。此检测不会自动运行，需要手动点击。";
-      $("webrtcRiskCard").className = "item wide risk-card risk-neutral";
-    }
-
-    function setWebRTCLoading() {
-      $("webrtcStatus").textContent = "检测中";
-      $("webrtcCount").textContent = "--";
-      $("webrtcLeak").textContent = "分析中";
-      $("webrtcCandidates").textContent = "正在收集 ICE 候选地址...";
-      $("webrtcDesc").textContent = "正在通过 WebRTC ICE 候选收集本机暴露的网络信息。";
-      $("webrtcRiskCard").className = "item wide risk-card risk-neutral";
-    }
-
-    function parseCandidate(line) {
-      const parts = String(line || "").trim().split(/\s+/);
-      const typIndex = parts.indexOf("typ");
-      const address = parts[4] || "";
-      const port = parts[5] || "";
-      const type = typIndex >= 0 ? parts[typIndex + 1] || "unknown" : "unknown";
-      return { address, port, type, raw: line };
-    }
-
-    function isPrivateAddress(address) {
-      const value = String(address || "").toLowerCase();
-      return /^10\./.test(value) || /^192\.168\./.test(value) || /^172\.(1[6-9]|2\d|3[0-1])\./.test(value) || /^169\.254\./.test(value) || /^fc/.test(value) || /^fd/.test(value) || /^fe80/.test(value);
-    }
-
-    function isPublicIPv4(address) {
-      const value = String(address || "");
-      if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(value)) return false;
-      if (isPrivateAddress(value)) return false;
-      return value.split(".").every((part) => Number(part) >= 0 && Number(part) <= 255);
-    }
-
-    function classifyWebRTCCandidates(lines) {
-      const items = [...new Map(lines.map((line) => [line, parseCandidate(line)])).values()].filter((item) => item.address);
-      const mdns = items.filter((item) => item.address.endsWith(".local"));
-      const privateIps = items.filter((item) => isPrivateAddress(item.address));
-      const publicIps = items.filter((item) => isPublicIPv4(item.address));
-      const currentIp = currentRegionData && currentRegionData.ip ? currentRegionData.ip : "";
-      const extraPublic = publicIps.filter((item) => item.address !== currentIp);
-
-      let riskLevel = "good";
-      let riskText = "绿色 · 未发现明显 WebRTC 泄露";
-
-      if (privateIps.length) {
-        riskLevel = "bad";
-        riskText = "红色 · 发现本地 IP 地址，WebRTC 可能暴露了本机网络信息";
-      } else if (extraPublic.length) {
-        riskLevel = "bad";
-        riskText = "红色 · 发现额外公网 IP，可能不是当前出口地址";
-      } else if (mdns.length) {
-        riskLevel = "mid";
-        riskText = "黄色 · 发现 mDNS 标识，浏览器隐藏了真实本地 IP，但仍暴露了本地候选信息";
-      } else if (publicIps.length) {
-        riskLevel = "good";
-        riskText = "绿色 · 仅发现当前出口公网 IP";
-      } else if (!items.length) {
-        riskLevel = "good";
-        riskText = "绿色 · 未发现候选地址";
+      const extLink = $("externalMapLink");
+      if (extLink) {
+        extLink.href = externalUrl;
       }
-
-      return { items, mdns, privateIps, publicIps, extraPublic, riskLevel, riskText };
     }
 
-    async function collectWebRTCCandidates() {
-      const RTCPeer = window.RTCPeerConnection || window.webkitRTCPeerConnection || window.mozRTCPeerConnection;
-      if (!RTCPeer) throw new Error("unsupported");
+    // 移动端抽屉菜单控制
+    function toggleMobileMenu() {
+      $("mobileScreen").classList.toggle("open");
+    }
 
-      const pc = new RTCPeer({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
-      const lines = [];
-      pc.createDataChannel("geoping");
+    function closeMobileMenu() {
+      $("mobileScreen").classList.remove("open");
+    }
 
-      pc.onicecandidate = (event) => {
-        if (event.candidate && event.candidate.candidate) lines.push(event.candidate.candidate);
-      };
+    function selectLanguageMobile(lang) {
+      changeLanguage(lang);
+      closeMobileMenu();
+    }
 
-      const offer = await pc.createOffer();
-      await pc.setLocalDescription(offer);
+    // 桌面端语言下拉菜单控制
+    function toggleLangMenu(event) {
+      event.stopPropagation();
+      const menu = $("langMenu");
+      const btn = $("langTriggerBtn");
+      const isOpen = menu.classList.toggle("open");
+      btn.setAttribute("aria-expanded", String(isOpen));
+    }
 
-      await new Promise((resolve) => {
-        const timer = setTimeout(resolve, 5200);
-        pc.onicegatheringstatechange = () => {
-          if (pc.iceGatheringState === "complete") {
-            clearTimeout(timer);
-            resolve();
-          }
-        };
+    function closeLangMenu() {
+      $("langMenu").classList.remove("open");
+      $("langTriggerBtn").setAttribute("aria-expanded", "false");
+    }
+
+    document.addEventListener("click", (e) => {
+      if (!$("langDropdown").contains(e.target)) {
+        closeLangMenu();
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeLangMenu();
+        closeMobileMenu();
+      }
+    });
+
+    function selectLanguage(lang) {
+      closeLangMenu();
+      changeLanguage(lang);
+    }
+
+    // 主题控制
+    function initTheme() {
+      const saved = localStorage.getItem("ip_inspector_theme");
+      if (saved === "dark" || saved === "light") {
+        currentTheme = saved;
+      } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        currentTheme = "dark";
+      }
+      applyTheme(currentTheme);
+    }
+
+    function applyTheme(theme) {
+      currentTheme = theme;
+      document.body.classList.toggle("dark", theme === "dark");
+      localStorage.setItem("ip_inspector_theme", theme);
+    }
+
+    function toggleTheme() {
+      applyTheme(currentTheme === "light" ? "dark" : "light");
+    }
+
+    // 语言初始化与切换
+    function initLanguage() {
+      const savedLang = localStorage.getItem("ip_inspector_lang");
+      if (savedLang && I18N[savedLang]) {
+        currentLang = savedLang;
+      } else {
+        const navLang = (navigator.language || "").toLowerCase();
+        if (navLang.startsWith("ja")) currentLang = "ja";
+        else if (navLang.startsWith("en")) currentLang = "en";
+        else currentLang = "zh";
+      }
+      applyLanguageUI();
+    }
+
+    function changeLanguage(lang) {
+      if (!I18N[lang]) return;
+      currentLang = lang;
+      localStorage.setItem("ip_inspector_lang", lang);
+      applyLanguageUI();
+      updateGoogleMap(currentCoords.lat, currentCoords.lng);
+      renderIpv6Status();
+      if (lastMergedData) {
+        renderAll(lastMergedData, lastRawPayload, lastIsCustom);
+      }
+    }
+
+    function applyLanguageUI() {
+      document.documentElement.lang = t("localeCode");
+      $("currentLangLabel").textContent = t("langName");
+      $("ipInput").placeholder = t("searchPlaceholder");
+
+      document.querySelectorAll("#langMenu .dropdown-item, .mobile-lang-btn").forEach((btn) => {
+        btn.classList.toggle("active", btn.getAttribute("data-lang") === currentLang);
       });
 
-      if (pc.localDescription && pc.localDescription.sdp) {
-        pc.localDescription.sdp.split("\n").forEach((line) => {
-          const trimmed = line.trim();
-          if (trimmed.startsWith("a=candidate:")) lines.push(trimmed.replace(/^a=/, ""));
-        });
-      }
-
-      pc.close();
-      return [...new Set(lines)];
+      document.querySelectorAll("[data-i18n]").forEach((el) => {
+        const key = el.getAttribute("data-i18n");
+        if (key === "rawExpand") {
+          const isOpen = $("rawJson").classList.contains("open");
+          el.textContent = isOpen ? t("rawCollapse") : t("rawExpand");
+        } else {
+          el.textContent = t(key);
+        }
+      });
     }
 
-    async function runWebRTCCheck() {
-      const btn = $("webrtcBtn");
-      btn.disabled = true;
-      btn.textContent = "检测中...";
-      setWebRTCLoading();
+    $("ipInput").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") handleQuery();
+    });
+
+    function countryCodeToFlag(code) {
+      if (!code || code.length !== 2) return "";
+      const pts = [...code.toUpperCase()].map((c) => 127397 + c.charCodeAt(0));
+      return String.fromCodePoint(...pts);
+    }
+
+    function getCountryLocalized(code) {
+      if (!code) return "";
+      try {
+        return new Intl.DisplayNames([t("localeCode")], { type: "region" }).of(code.toUpperCase()) || code;
+      } catch {
+        return code;
+      }
+    }
+
+    // 精准识别 AS Type
+    function classifyAsType(orgStr = "", apiType = "", hostname = "") {
+      const rawType = String(apiType || "").toLowerCase();
+      const text = `${orgStr} ${hostname}`.toLowerCase();
+
+      const hostingKeywords = [
+        "amazon", "aws", "google", "microsoft", "azure", "digitalocean", "linode", "akamai",
+        "vultr", "hetzner", "ovh", "oracle", "alibaba", "tencent", "cloudflare", "choopa",
+        "leaseweb", "contabo", "datacamp", "m247", "zenlayer", "psychz", "quadranet", "host", "cloud", "server", "vps", "datacenter"
+      ];
+      const eduKeywords = ["university", "college", "institute", "education", "academic", "school", ".edu", "ac.jp", "edu.cn"];
+      const ispKeywords = [
+        "telecom", "mobile", "unicom", "comcast", "at&t", "verizon", "t-mobile", "spectrum",
+        "charter", "cox", "ntt", "kddi", "softbank", "chunghwa", "hinet", "kt corp", "sk broadband",
+        "lg uplus", "vodafone", "deutsche telekom", "orange", "telefonica", "virgin media", "rogers", "bell", "telus", "broadband", "fiber", "cable", "ocn", "sony network", "biglobe"
+      ];
+
+      if (rawType === "hosting" || hostingKeywords.some((k) => text.includes(k))) {
+        return { code: "Hosting", label: t("asHosting"), badgeClass: "badge-warning" };
+      }
+      if (rawType === "education" || eduKeywords.some((k) => text.includes(k))) {
+        return { code: "Education", label: t("asEdu"), badgeClass: "badge-purple" };
+      }
+      if (rawType === "isp" || ispKeywords.some((k) => text.includes(k))) {
+        return { code: "ISP", label: t("asIsp"), badgeClass: "badge-success" };
+      }
+      if (rawType === "business") {
+        return { code: "Business", label: t("asBusiness"), badgeClass: "badge-brand" };
+      }
+      return { code: "ISP / Business", label: t("asDefault"), badgeClass: "badge-brand" };
+    }
+
+    function renderIpv6Status() {
+      const st = lastIpv6State;
+      if (st.type === "loading") {
+        $("ipv6Status").textContent = t("detecting");
+      } else if (st.type === "ipv6") {
+        $("ipv6Status").innerHTML = `<span class="code-pill">${st.ip}</span>`;
+      } else if (st.type === "ipv4_target") {
+        $("ipv6Status").textContent = t("ipv4Target");
+      } else {
+        $("ipv6Status").textContent = t("notDetected");
+      }
+    }
+
+    async function detectIpv6(isCustom, targetIp) {
+      if (isCustom) {
+        lastIpv6State = targetIp.includes(":")
+          ? { type: "ipv6", ip: targetIp }
+          : { type: "ipv4_target", ip: "" };
+        renderIpv6Status();
+        return;
+      }
+      lastIpv6State = { type: "loading", ip: "" };
+      renderIpv6Status();
+      try {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 3500);
+        const res = await fetch("https://api64.ipify.org?format=json", { signal: controller.signal, cache: "no-store" });
+        clearTimeout(timer);
+        const json = await res.json();
+        if (json.ip && json.ip.includes(":")) {
+          lastIpv6State = { type: "ipv6", ip: json.ip };
+        } else {
+          lastIpv6State = { type: "none", ip: "" };
+        }
+      } catch {
+        lastIpv6State = { type: "none", ip: "" };
+      }
+      renderIpv6Status();
+    }
+
+    function setLoading(isCustom, targetIp = "") {
+      $("queryBtn").disabled = true;
+      $("myIpBtn").disabled = true;
+      $("ipValue").textContent = isCustom ? targetIp : t("detecting");
+      $("crumbIp").textContent = isCustom ? targetIp : "...";
+      $("statusBadge").className = "badge badge-brand";
+      $("statusBadge").innerHTML = `<span class="badge-dot"></span>${t("requesting")}`;
+      $("asTypeHeroBadge").className = "badge badge-brand";
+      $("asTypeHeroBadge").innerHTML = `<span class="badge-dot"></span>AS Type: ${t("identifying")}`;
+    }
+
+    function renderAll(merged, rawPayload, isCustom) {
+      lastMergedData = merged;
+      lastRawPayload = rawPayload;
+      lastIsCustom = isCustom;
+
+      currentIp = merged.ip || "";
+      $("ipValue").textContent = currentIp || "--";
+      $("crumbIp").textContent = currentIp || "--";
+
+      $("statusBadge").className = "badge badge-success";
+      $("statusBadge").innerHTML = `<span class="badge-dot"></span>${t("ready")}`;
+
+      // 1. AS Type
+      const asInfo = classifyAsType(merged.org, merged.apiType, merged.hostname);
+      $("asTypeHeroBadge").className = `badge ${asInfo.badgeClass}`;
+      $("asTypeHeroBadge").innerHTML = `<span class="badge-dot"></span>AS Type: ${asInfo.code}`;
+      $("heroAsType").textContent = asInfo.label;
+      $("sumAsType").innerHTML = `<span class="badge ${asInfo.badgeClass}" style="padding: 2px 10px; font-size: 12px;">${asInfo.label}</span>`;
+
+      // 2. ASN & Company
+      const asnDisplay = merged.asn ? `${merged.asn} — ${merged.company}` : (merged.company || "--");
+      $("heroAsnOrg").textContent = asnDisplay;
+      $("sumAsn").innerHTML = merged.asn
+        ? `<span class="code-pill">${merged.asn}</span> — ${merged.company || ""}`
+        : (merged.company || "--");
+      $("sumCompany").textContent = merged.company || "--";
+
+      // 3. Location
+      const flag = countryCodeToFlag(merged.country);
+      const countryLocal = getCountryLocalized(merged.country);
+      const locLine = [merged.city, merged.region, `${flag} ${merged.country}`].filter(Boolean).join(", ");
+      $("heroLocation").textContent = `${flag} ${countryLocal} · ${merged.city || merged.region || merged.country}`;
+      $("sumLocation").textContent = locLine || "--";
+
+      // 4. Hostname / Range / Hosted domains
+      $("sumHostname").textContent = merged.hostname || "—";
+      $("sumRange").innerHTML = merged.range ? `<span class="code-pill">${merged.range}</span>` : "—";
+      $("sumHostedDomains").textContent = merged.hostedDomains ?? "0";
+
+      // 5. Privacy & Anycast
+      const isProxy = Boolean(merged.privacy);
+      const isAnycast = Boolean(merged.anycast);
+      $("sumPrivacy").innerHTML = isProxy
+        ? `<span style="color: var(--error-700);">⚠ ${t("privacyTrue")}</span>`
+        : `<span style="color: var(--success-700);">✕ ${t("privacyFalse")}</span>`;
+      $("sumAnycast").innerHTML = isAnycast
+        ? `<span style="color: var(--brand-700);">✓ ${t("anycastTrue")}</span>`
+        : `<span style="color: var(--text-secondary);">✕ false</span>`;
+      $("heroPrivacyAnycast").textContent = `Privacy: ${isProxy ? "true" : "false"} · Anycast: ${isAnycast ? "true" : "false"}`;
+
+      // 6. Abuse contact
+      if (merged.abuse) {
+        $("sumAbuse").innerHTML = `<a class="map-link" href="mailto:${merged.abuse}">${merged.abuse}</a>`;
+      } else {
+        $("sumAbuse").textContent = "—";
+      }
+
+      // 7. Geolocation & Google Maps 实时定位更新
+      $("geoCountry").textContent = countryLocal ? `${flag} ${countryLocal} (${merged.country})` : (merged.country || "--");
+      $("geoRegion").textContent = merged.region || "--";
+      $("geoCity").textContent = merged.city || "--";
+      $("geoPostal").textContent = merged.postal || "--";
+
+      const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+      let tzText = merged.timezone || "--";
+      if (merged.timezone && localTz && !isCustom) {
+        tzText += ` ${merged.timezone === localTz ? t("tzMatch") : t("tzDiff")}`;
+      }
+      $("geoTimezone").textContent = tzText;
+
+      if (merged.lat && merged.lng) {
+        const latNum = parseFloat(merged.lat);
+        const lngNum = parseFloat(merged.lng);
+        $("geoCoords").textContent = `${latNum.toFixed(5)}, ${lngNum.toFixed(5)}`;
+        updateGoogleMap(latNum, lngNum);
+      } else {
+        $("geoCoords").textContent = "--";
+      }
+
+      // 8. Raw JSON
+      $("rawJson").textContent = JSON.stringify(rawPayload, null, 2);
+
+      $("queryBtn").disabled = false;
+      $("myIpBtn").disabled = false;
+    }
+
+    function renderError(msg) {
+      lastMergedData = null;
+      $("ipValue").textContent = t("queryFailed");
+      $("statusBadge").className = "badge badge-error";
+      $("statusBadge").innerHTML = `<span class="badge-dot"></span>${t("errorBadge")}`;
+      $("asTypeHeroBadge").className = "badge badge-error";
+      $("asTypeHeroBadge").innerHTML = `<span class="badge-dot"></span>${t("queryFailed")}`;
+      $("heroLocation").textContent = msg;
+      $("queryBtn").disabled = false;
+      $("myIpBtn").disabled = false;
+    }
+
+    async function fetchIpData(targetIp = "") {
+      const isCustom = Boolean(targetIp);
+      setLoading(isCustom, targetIp);
+      detectIpv6(isCustom, targetIp);
+
+      const ipinfoUrl = isCustom
+        ? `https://ipinfo.io/${encodeURIComponent(targetIp)}/json`
+        : `https://ipinfo.io/json`;
+
+      const ipwhoUrl = isCustom
+        ? `https://ipwho.is/${encodeURIComponent(targetIp)}`
+        : `https://ipwho.is/`;
 
       try {
-        const lines = await collectWebRTCCandidates();
-        const result = classifyWebRTCCandidates(lines);
-        $("webrtcStatus").textContent = "已启用";
-        $("webrtcCount").textContent = `${result.items.length}`;
-        $("webrtcLeak").textContent = result.riskText;
-        $("webrtcRiskCard").className = `item wide risk-card risk-${result.riskLevel}`;
-        $("webrtcCandidates").textContent = result.items.length ? result.items.map((item) => `${item.type} · ${item.address}${item.port ? ":" + item.port : ""}`).join("\n") : "未发现候选地址";
-        $("webrtcDesc").textContent = "检测完成。绿色表示未发现明显泄露；黄色表示 mDNS 本地标识；红色表示发现本地 IP 或额外公网 IP。";
-      } catch (error) {
-        $("webrtcStatus").textContent = error.message === "unsupported" ? "不支持" : "检测失败";
-        $("webrtcCount").textContent = "--";
-        $("webrtcLeak").textContent = error.message === "unsupported" ? "当前浏览器不支持 WebRTC 检测" : "无法完成检测";
-        $("webrtcRiskCard").className = "item wide risk-card risk-neutral";
-        $("webrtcCandidates").textContent = EMPTY;
-        $("webrtcDesc").textContent = "WebRTC 检测不可用，可能是浏览器不支持、权限策略限制，或网络策略拦截。";
+        const [ipinfoRes, ipwhoRes] = await Promise.allSettled([
+          fetch(ipinfoUrl, { cache: "no-store" }).then((r) => {
+            if (!r.ok) throw new Error(`ipinfo HTTP ${r.status}`);
+            return r.json();
+          }),
+          fetch(ipwhoUrl, { cache: "no-store" }).then((r) => r.ok ? r.json() : null)
+        ]);
+
+        if (ipinfoRes.status !== "fulfilled" || ipinfoRes.value.error) {
+          const errMsg = ipinfoRes.value?.error?.message || t("errConnect");
+          throw new Error(errMsg);
+        }
+
+        const info = ipinfoRes.value;
+        const who = (ipwhoRes.status === "fulfilled" && ipwhoRes.value && ipwhoRes.value.success !== false)
+          ? ipwhoRes.value
+          : {};
+
+        const rawOrg = info.org || "";
+        const asnMatch = rawOrg.match(/^(AS\d+)\s*(.*)$/i);
+        const asnCode = asnMatch ? asnMatch[1].toUpperCase() : (who.connection?.asn ? `AS${who.connection.asn}` : "");
+        const companyName = (asnMatch && asnMatch[2]) ? asnMatch[2] : (who.connection?.org || who.connection?.isp || rawOrg);
+
+        let lat = "", lng = "";
+        if (info.loc && info.loc.includes(",")) {
+          [lat, lng] = info.loc.split(",");
+        } else if (who.latitude && who.longitude) {
+          lat = String(who.latitude);
+          lng = String(who.longitude);
+        }
+
+        const ipStr = info.ip || targetIp;
+        let cidrRange = "";
+        if (ipStr && ipStr.includes(".")) {
+          const parts = ipStr.split(".");
+          if (parts.length === 4) cidrRange = `${parts[0]}.${parts[1]}.0.0/16`;
+        }
+
+        const domainStr = who.connection?.domain || "";
+        const abuseEmail = domainStr ? `abuse@${domainStr}` : "";
+
+        const merged = {
+          ip: ipStr,
+          country: (info.country || who.country_code || "").toUpperCase(),
+          region: info.region || who.region || "",
+          city: info.city || who.city || "",
+          postal: info.postal || who.postal || "",
+          timezone: info.timezone || who.timezone?.id || "",
+          org: rawOrg,
+          asn: asnCode,
+          company: companyName,
+          hostname: info.hostname || "",
+          anycast: Boolean(info.anycast),
+          privacy: Boolean(who.security?.vpn || who.security?.proxy || who.security?.tor || who.security?.hosting),
+          apiType: who.type || "",
+          range: cidrRange,
+          hostedDomains: "0",
+          abuse: abuseEmail,
+          lat,
+          lng
+        };
+
+        renderAll(merged, { ipinfo: info, supplemental: who }, isCustom);
+      } catch (err) {
+        renderError(err.message || t("errConnect"));
       }
-
-      btn.disabled = false;
-      btn.textContent = "重新检测 WebRTC";
     }
 
-    async function detectAll() {
-      const btn = $("detectBtn");
-      btn.disabled = true;
-      btn.textContent = "检测中...";
-      setBasicInfo();
-      setLoading();
-      setSpeedLoading();
-      await Promise.allSettled([
-        getRegionData().then(setResult).catch(setError),
-        runSpeedTest().then(updateSpeed).catch(setSpeedError)
-      ]);
-      btn.disabled = false;
-      btn.textContent = "重新检测";
+    function handleQuery() {
+      const val = $("ipInput").value.trim();
+      fetchIpData(val);
     }
 
-    initPage();
+    function fetchMyIp() {
+      $("ipInput").value = "";
+      fetchIpData("");
+    }
+
+    async function copyIp() {
+      if (!currentIp) return;
+      try {
+        await navigator.clipboard.writeText(currentIp);
+        $("copyBtnText").textContent = t("btnCopied");
+        setTimeout(() => { $("copyBtnText").textContent = t("btnCopy"); }, 1200);
+      } catch {}
+    }
+
+    function toggleRaw() {
+      const box = $("rawJson");
+      const isOpen = box.classList.toggle("open");
+      $("rawToggleText").textContent = isOpen ? t("rawCollapse") : t("rawExpand");
+    }
+
+    // 启动初始化
+    initTheme();
+    initLanguage();
+    fetchMyIp();
   </script>
 </body>
 </html>
