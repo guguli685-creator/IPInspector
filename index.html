@@ -117,7 +117,7 @@
       overflow-y: scroll;
     }
 
-    /* VitePress 极简风格固定顶部菜单栏 - PC全屏流式铺满 */
+    /* VitePress 极简风格固定顶部菜单栏 - 高于遮罩层，与下拉面板无缝连接 */
     header {
       position: fixed;
       top: 0;
@@ -126,8 +126,12 @@
       height: var(--vp-nav-height);
       background-color: var(--bg-card);
       border-bottom: 1px solid var(--border-light);
-      z-index: 1000;
+      z-index: 1100;
       transition: background-color 0.25s ease, border-color 0.25s ease;
+    }
+
+    header.panel-active {
+      border-bottom-color: transparent;
     }
 
     .nav-container {
@@ -138,6 +142,11 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      position: relative;
+      z-index: 2;
+      background-color: var(--bg-card);
+      border-bottom: 1px solid var(--border-light);
+      transition: background-color 0.25s ease, border-color 0.25s ease;
     }
 
     .nav-title {
@@ -246,7 +255,7 @@
     body.dark .sun-icon { display: none; }
     body.dark .moon-icon { display: block; }
 
-    /* 桌面端自定义语言下拉浮层 */
+    /* 桌面端自定义语言下拉浮层 - 淡入淡出过渡 */
     .dropdown {
       position: relative;
       display: inline-flex;
@@ -263,12 +272,12 @@
       background: var(--bg-card);
       border: 1px solid var(--border-light);
       box-shadow: var(--shadow-lg);
-      z-index: 1100;
+      z-index: 1200;
       opacity: 0;
       visibility: hidden;
       transform: translateY(-6px) scale(0.98);
       transform-origin: top right;
-      transition: opacity 0.16s ease, transform 0.16s ease, visibility 0.16s;
+      transition: opacity 0.22s ease, transform 0.22s cubic-bezier(.32,.72,0,1), visibility 0.22s ease;
     }
 
     .dropdown-menu.open {
@@ -293,7 +302,7 @@
       line-height: 1.2;
       text-align: left;
       cursor: pointer;
-      transition: background-color 0.12s ease, color 0.12s ease;
+      transition: background-color 0.15s ease, color 0.15s ease;
     }
 
     .dropdown-item:hover {
@@ -317,28 +326,28 @@
       opacity: 1;
     }
 
-    /* 开源信息下拉面板（移植自 BzStream 开源面板实现） */
+    /* 开源信息下拉面板与遮罩（与顶栏连成一体，带淡入淡出动态效果） */
     .oss-backdrop {
       position: fixed;
       inset: 0;
       z-index: 1050;
-      background: rgba(8, 12, 23, 0.36);
-      -webkit-backdrop-filter: blur(2px);
-      backdrop-filter: blur(2px);
+      background: rgba(8, 12, 23, 0.38);
+      -webkit-backdrop-filter: blur(3px);
+      backdrop-filter: blur(3px);
       opacity: 0;
       visibility: hidden;
-      transition: opacity 0.2s ease, visibility 0.2s ease;
+      transition: opacity 0.28s ease, visibility 0.28s ease;
     }
     .oss-backdrop.show {
       opacity: 1;
       visibility: visible;
     }
     .oss-panel-wrap {
-      position: fixed;
-      top: var(--vp-nav-height);
+      position: absolute;
+      top: 100%;
       left: 0;
       right: 0;
-      z-index: 1060;
+      z-index: 1;
       pointer-events: none;
       padding: 0 28px;
       display: flex;
@@ -354,12 +363,12 @@
       background: var(--bg-card);
       border: 1px solid var(--border-light);
       border-top: 0;
-      border-radius: 0 0 16px 16px;
+      border-radius: 0 0 18px 18px;
       box-shadow: var(--shadow-lg);
       opacity: 0;
       visibility: hidden;
       transform: translateY(-10px);
-      transition: opacity 0.2s ease, transform 0.24s cubic-bezier(.32,.72,0,1), visibility 0.24s;
+      transition: opacity 0.26s ease, transform 0.28s cubic-bezier(.32,.72,0,1), visibility 0.28s ease, background-color 0.25s ease, border-color 0.25s ease;
       overflow: hidden;
     }
     .oss-panel.show {
@@ -372,7 +381,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 8px;
-      padding: 12px 16px;
+      padding: 12px 18px;
       border-bottom: 1px solid var(--border-light);
       flex-shrink: 0;
     }
@@ -393,7 +402,7 @@
       display: grid;
       place-items: center;
       font-size: 13px;
-      transition: background-color 0.15s, color 0.15s;
+      transition: background-color 0.18s ease, color 0.18s ease;
     }
     .oss-panel-close:hover {
       background: var(--error-50);
@@ -401,7 +410,15 @@
     }
     .oss-panel-body {
       overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
       padding: 16px 20px 22px;
+    }
+    .oss-panel-body.fade-in {
+      animation: panelContentFadeIn 0.26s ease both;
+    }
+    @keyframes panelContentFadeIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     .oss-panel-body h4 {
       margin: 16px 0 6px;
@@ -449,6 +466,7 @@
       display: block;
       z-index: 1;
       background: var(--bg-subtle);
+      transition: opacity 0.25s ease;
     }
     .oss-author-meta {
       min-width: 0;
@@ -484,7 +502,7 @@
       color: var(--text-primary);
       text-decoration: none;
       background: var(--bg-card);
-      transition: border-color 0.15s, color 0.15s, background-color 0.15s;
+      transition: border-color 0.18s ease, color 0.18s ease, background-color 0.18s ease;
     }
     .oss-author-link:hover {
       border-color: var(--brand-600);
@@ -496,6 +514,7 @@
       height: 14px;
       flex: none;
       color: var(--text-tertiary);
+      transition: color 0.18s ease;
     }
     .oss-author-link:hover svg {
       color: var(--brand-600);
@@ -513,7 +532,7 @@
       font-family: var(--font-mono);
       font-size: 12px;
       color: var(--brand-600);
-      transition: border-color 0.15s;
+      transition: border-color 0.18s ease, background-color 0.18s ease;
     }
     .oss-repo-link:hover {
       border-color: var(--brand-600);
@@ -560,7 +579,7 @@
       }
     }
 
-    /* 移动端汉堡按钮与全屏抽屉菜单 */
+    /* 移动端汉堡按钮与全屏抽屉菜单 - 增加淡入淡出联动过渡 */
     .hamburger {
       display: none;
       background: none;
@@ -580,6 +599,7 @@
       height: 2px;
       background-color: currentColor;
       border-radius: 2px;
+      transition: transform 0.25s ease, opacity 0.25s ease;
     }
 
     .mobile-screen {
@@ -593,15 +613,19 @@
       display: flex;
       flex-direction: column;
       gap: 0;
-      transform: translateX(100%);
-      transition: transform 0.3s ease-in-out;
-      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-8px);
+      transition: opacity 0.26s ease, transform 0.28s cubic-bezier(.32,.72,0,1), visibility 0.28s ease, background-color 0.25s ease;
+      z-index: 1090;
       border-top: 1px solid var(--border-light);
       overflow-y: auto;
     }
 
     .mobile-screen.open {
-      transform: translateX(0);
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
     }
 
     .screen-item {
@@ -619,6 +643,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      transition: color 0.18s ease, background-color 0.18s ease;
     }
 
     /* 移动端语言设置一级可折叠收纳盒 */
@@ -662,11 +687,13 @@
     .mobile-lang-drawer {
       display: grid;
       grid-template-rows: 0fr;
-      transition: grid-template-rows 0.24s ease;
+      opacity: 0;
+      transition: grid-template-rows 0.26s ease, opacity 0.24s ease;
     }
 
     .mobile-lang-accordion.expanded .mobile-lang-drawer {
       grid-template-rows: 1fr;
+      opacity: 1;
     }
 
     .mobile-lang-drawer-inner {
@@ -1270,6 +1297,7 @@
 
     .raw-content.open {
       display: block;
+      animation: panelContentFadeIn 0.22s ease both;
     }
 
     .footer-note {
@@ -1387,12 +1415,19 @@
         grid-template-columns: 1fr;
       }
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        transition: none !important;
+        animation: none !important;
+      }
+    }
   </style>
 </head>
 <body>
 
-  <!-- VitePress 极简风格固定顶部菜单栏 -->
-  <header>
+  <!-- VitePress 极简风格固定顶部菜单栏（与下拉面板无缝连接） -->
+  <header id="topHeader">
     <div class="nav-container">
       <button class="nav-title" onclick="location.reload()">
         <div class="logo-box">
@@ -1443,19 +1478,21 @@
         </div>
       </div>
     </div>
+
+    <!-- 开源信息下拉面板：挂在 header 内部 top:100%，保证 PC 端与手机端均紧贴顶栏无缝展开 -->
+    <div class="oss-panel-wrap">
+      <section class="oss-panel" id="ossPanel" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="ossPanelTitle">
+        <div class="oss-panel-head">
+          <h3 id="ossPanelTitle" data-i18n="ossPanelTitle">开源信息</h3>
+          <button class="oss-panel-close" type="button" onclick="closeOssPanel()" aria-label="Close">✕</button>
+        </div>
+        <div class="oss-panel-body" id="ossPanelBody"></div>
+      </section>
+    </div>
   </header>
 
-  <!-- 开源信息下拉面板与遮罩 -->
+  <!-- 开源信息全屏遮罩（位于 header z-index:1100 下方，不会遮挡顶部导航栏） -->
   <div class="oss-backdrop" id="ossBackdrop" onclick="closeOssPanel()"></div>
-  <div class="oss-panel-wrap">
-    <section class="oss-panel" id="ossPanel" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="ossPanelTitle">
-      <div class="oss-panel-head">
-        <h3 id="ossPanelTitle" data-i18n="ossPanelTitle">开源信息</h3>
-        <button class="oss-panel-close" type="button" onclick="closeOssPanel()" aria-label="Close">✕</button>
-      </div>
-      <div class="oss-panel-body" id="ossPanelBody"></div>
-    </section>
-  </div>
 
   <!-- 移动端全屏抽屉菜单 -->
   <div class="mobile-screen" id="mobileScreen">
@@ -1716,7 +1753,7 @@
   <script>
     const $ = (id) => document.getElementById(id);
 
-    // 开源项目配置（移植自 BzStream 静态配置驱动模式）
+    // 开源项目配置（静态配置驱动模式）
     const PROJECT = {
       name: "IP Inspector",
       repo: "https://github.com/guguli685-creator/IPInspector/tree/main",
@@ -1980,7 +2017,7 @@
         .replace(/"/g, "&quot;");
     }
 
-    /* ================= 开源菜单面板逻辑（移植自 BzStream） ================= */
+    /* ================= 开源菜单面板逻辑（顶栏一体衔接 + 淡入淡出动画） ================= */
     function buildOssPanelHtml() {
       const a = PROJECT.author || {};
       const initial = escHtml(String(a.name || "S").trim().charAt(0).toUpperCase());
@@ -2038,6 +2075,15 @@
       `;
     }
 
+    function renderOssBodyWithFade() {
+      const bodyEl = $("ossPanelBody");
+      bodyEl.innerHTML = buildOssPanelHtml();
+      bodyEl.classList.remove("fade-in");
+      void bodyEl.offsetWidth;
+      bodyEl.classList.add("fade-in");
+      bindOssAvatarFallback();
+    }
+
     function bindOssAvatarFallback() {
       const img = $("ossPanelBody").querySelector("[data-oss-avatar]");
       if (!img) return;
@@ -2060,14 +2106,15 @@
     function openOssPanel() {
       closeLangMenu();
       $("ossPanelTitle").textContent = t("ossPanelTitle");
-      $("ossPanelBody").innerHTML = buildOssPanelHtml();
-      bindOssAvatarFallback();
+      renderOssBodyWithFade();
+      $("topHeader").classList.add("panel-active");
       $("ossBackdrop").classList.add("show");
       $("ossPanel").classList.add("show");
       $("ossPanel").setAttribute("aria-hidden", "false");
     }
 
     function closeOssPanel() {
+      $("topHeader").classList.remove("panel-active");
       $("ossBackdrop").classList.remove("show");
       $("ossPanel").classList.remove("show");
       $("ossPanel").setAttribute("aria-hidden", "true");
@@ -2207,8 +2254,7 @@
       localStorage.setItem("ip_inspector_lang", lang);
       applyLanguageUI();
       if ($("ossPanel").classList.contains("show")) {
-        $("ossPanelBody").innerHTML = buildOssPanelHtml();
-        bindOssAvatarFallback();
+        renderOssBodyWithFade();
       }
       updateGoogleMap(currentCoords.lat, currentCoords.lng);
       renderIpv6Status();
