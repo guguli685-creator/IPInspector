@@ -317,6 +317,249 @@
       opacity: 1;
     }
 
+    /* 开源信息下拉面板（移植自 BzStream 开源面板实现） */
+    .oss-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 1050;
+      background: rgba(8, 12, 23, 0.36);
+      -webkit-backdrop-filter: blur(2px);
+      backdrop-filter: blur(2px);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+    }
+    .oss-backdrop.show {
+      opacity: 1;
+      visibility: visible;
+    }
+    .oss-panel-wrap {
+      position: fixed;
+      top: var(--vp-nav-height);
+      left: 0;
+      right: 0;
+      z-index: 1060;
+      pointer-events: none;
+      padding: 0 28px;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .oss-panel {
+      pointer-events: auto;
+      width: 392px;
+      max-width: 100%;
+      max-height: min(76vh, 640px);
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-top: 0;
+      border-radius: 0 0 16px 16px;
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: opacity 0.2s ease, transform 0.24s cubic-bezier(.32,.72,0,1), visibility 0.24s;
+      overflow: hidden;
+    }
+    .oss-panel.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    .oss-panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-light);
+      flex-shrink: 0;
+    }
+    .oss-panel-head h3 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .oss-panel-close {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      font-size: 13px;
+      transition: background-color 0.15s, color 0.15s;
+    }
+    .oss-panel-close:hover {
+      background: var(--error-50);
+      color: var(--error-700);
+    }
+    .oss-panel-body {
+      overflow-y: auto;
+      padding: 16px 20px 22px;
+    }
+    .oss-panel-body h4 {
+      margin: 16px 0 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .oss-panel-body p {
+      margin: 0 0 8px;
+      font-size: 13px;
+      line-height: 1.65;
+      color: var(--text-secondary);
+    }
+    .oss-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .oss-author-avatar {
+      position: relative;
+      flex: none;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--brand-600), #8b5cf6);
+      box-shadow: 0 8px 18px -10px var(--brand-600);
+    }
+    .oss-author-avatar > span {
+      position: relative;
+      z-index: 0;
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 18px;
+    }
+    .oss-author-avatar img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      z-index: 1;
+      background: var(--bg-subtle);
+    }
+    .oss-author-meta {
+      min-width: 0;
+    }
+    .oss-author-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .oss-author-role {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      margin-top: 2px;
+    }
+    .oss-author-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .oss-author-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--border-light);
+      border-radius: 9px;
+      padding: 6px 11px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      text-decoration: none;
+      background: var(--bg-card);
+      transition: border-color 0.15s, color 0.15s, background-color 0.15s;
+    }
+    .oss-author-link:hover {
+      border-color: var(--brand-600);
+      color: var(--brand-600);
+      background: var(--brand-50);
+    }
+    .oss-author-link svg {
+      width: 14px;
+      height: 14px;
+      flex: none;
+      color: var(--text-tertiary);
+    }
+    .oss-author-link:hover svg {
+      color: var(--brand-600);
+    }
+    .oss-repo-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 6px 0 4px;
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      padding: 10px 12px;
+      background: var(--bg-subtle);
+      text-decoration: none;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--brand-600);
+      transition: border-color 0.15s;
+    }
+    .oss-repo-link:hover {
+      border-color: var(--brand-600);
+    }
+    .oss-repo-link svg {
+      width: 15px;
+      height: 15px;
+      flex: none;
+    }
+    .oss-repo-link span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .oss-kv {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border-light);
+      font-size: 13px;
+    }
+    .oss-kv:last-of-type {
+      border-bottom: 0;
+    }
+    .oss-kv span:first-child {
+      color: var(--text-tertiary);
+    }
+    .oss-kv span:last-child {
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      text-align: right;
+      word-break: break-all;
+    }
+    @media (max-width: 600px) {
+      .oss-panel-wrap {
+        padding: 0;
+      }
+      .oss-panel {
+        width: 100%;
+        border-left: 0;
+        border-right: 0;
+      }
+    }
+
     /* 移动端汉堡按钮与全屏抽屉菜单 */
     .hamburger {
       display: none;
@@ -489,7 +732,7 @@
       padding: calc(var(--vp-nav-height) + 20px) 28px 40px;
     }
 
-    /* 顶部融合栏：PC 端支持搜索栏与状态胶囊同屏高效利用宽度 */
+    /* 顶部融合栏 */
     .toolbar {
       display: flex;
       gap: 12px;
@@ -826,7 +1069,7 @@
       transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.3s ease;
     }
 
-    /* PC 宽屏三栏 Dashboard 网格：彻底铺满全屏并消除纵向冗余滚动 */
+    /* PC 宽屏三栏 Dashboard 网格 */
     .main-grid {
       display: grid;
       grid-template-columns: 1fr 1fr 1.25fr;
@@ -939,7 +1182,7 @@
       line-height: 1.3;
     }
 
-    /* 右侧独立 Google Maps 实时地图卡片，自动撑满三栏等高 */
+    /* 右侧独立 Google Maps 实时地图卡片 */
     .map-card {
       display: flex;
       flex-direction: column;
@@ -1163,6 +1406,7 @@
           <button class="nav-item active" onclick="fetchMyIp()" data-i18n="navHome">首页</button>
           <a class="nav-item" href="https://ipinfo.io/what-is-my-ip" target="_blank" rel="noopener noreferrer" data-i18n="officialLink">IPinfo</a>
           <a class="nav-item" href="https://ippure.com/" target="_blank" rel="noopener noreferrer">IPPure</a>
+          <button class="nav-item" id="navOssBtn" type="button" onclick="toggleOssPanel()" data-i18n="navOss">开源</button>
         </nav>
 
         <div class="nav-actions">
@@ -1201,6 +1445,18 @@
     </div>
   </header>
 
+  <!-- 开源信息下拉面板与遮罩 -->
+  <div class="oss-backdrop" id="ossBackdrop" onclick="closeOssPanel()"></div>
+  <div class="oss-panel-wrap">
+    <section class="oss-panel" id="ossPanel" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="ossPanelTitle">
+      <div class="oss-panel-head">
+        <h3 id="ossPanelTitle" data-i18n="ossPanelTitle">开源信息</h3>
+        <button class="oss-panel-close" type="button" onclick="closeOssPanel()" aria-label="Close">✕</button>
+      </div>
+      <div class="oss-panel-body" id="ossPanelBody"></div>
+    </section>
+  </div>
+
   <!-- 移动端全屏抽屉菜单 -->
   <div class="mobile-screen" id="mobileScreen">
     <button class="screen-item" onclick="closeMobileMenu(); fetchMyIp();" data-i18n="navHome">首页</button>
@@ -1212,6 +1468,10 @@
       <span>IPPure</span>
       <span>↗</span>
     </a>
+    <button class="screen-item" type="button" onclick="closeMobileMenu(); openOssPanel();">
+      <span data-i18n="navOss">开源</span>
+      <span>›</span>
+    </button>
 
     <!-- 语言：简洁纯文字一级按钮，点击展开 / 再次点击收容进盒子 -->
     <div class="mobile-lang-accordion" id="mobileLangAccordion">
@@ -1456,6 +1716,23 @@
   <script>
     const $ = (id) => document.getElementById(id);
 
+    // 开源项目配置（移植自 BzStream 静态配置驱动模式）
+    const PROJECT = {
+      name: "IP Inspector",
+      repo: "https://github.com/guguli685-creator/IPInspector/tree/main",
+      issues: "https://github.com/guguli685-creator/IPInspector/issues",
+      license: "MIT",
+      version: "1.0.0",
+      author: {
+        name: "Su Wanqing",
+        profile: "https://github.com/guguli685-creator?tab=repositories",
+        avatar: "https://cdn.jsdelivr.net/gh/guguli685-creator/BzStream@main/Su%20Wanqing.png",
+        avatarFallbacks: [
+          "https://raw.githubusercontent.com/guguli685-creator/BzStream/main/Su%20Wanqing.png"
+        ]
+      }
+    };
+
     // 多语言字典 (简体中文 / English / 日本語)
     const I18N = {
       zh: {
@@ -1464,7 +1741,20 @@
         mapHl: "zh-CN",
         navHome: "首页",
         officialLink: "IPinfo",
+        navOss: "开源",
         mobileLangTitle: "语言",
+        ossPanelTitle: "开源信息",
+        authorRole: "作者 / 维护者",
+        authorProfile: "GitHub 主页",
+        authorRepo: "项目仓库",
+        authorIssues: "问题反馈",
+        ossAboutH: "关于本项目",
+        ossAboutP: "单文件纯静态 IP 与网络属性检测看板，零依赖、无构建、零 Token 暴露，所有查询均在本地浏览器完成。",
+        ossRepoH: "仓库地址",
+        ossLicenseH: "许可证",
+        ossStackH: "技术栈",
+        ossStackP: "原生 HTML / CSS / JavaScript，无外部前端框架依赖，全部逻辑内联在单文件中。",
+        ossNote: "欢迎提 Issue 反馈检测异常，或补充新的网络分析维度。",
         searchPlaceholder: "输入 IPv4 / IPv6 查询，留空检测本机...",
         btnQuery: "查询 IP",
         btnMyIp: "检测本机",
@@ -1525,7 +1815,20 @@
         mapHl: "en",
         navHome: "Home",
         officialLink: "IPinfo",
+        navOss: "Open Source",
         mobileLangTitle: "Language",
+        ossPanelTitle: "Open Source",
+        authorRole: "Author & maintainer",
+        authorProfile: "GitHub",
+        authorRepo: "Repository",
+        authorIssues: "Issues",
+        ossAboutH: "About this project",
+        ossAboutP: "A single-file static IP and network attribute dashboard with zero dependencies, no build step, and zero token exposure.",
+        ossRepoH: "Repository",
+        ossLicenseH: "License",
+        ossStackH: "Tech stack",
+        ossStackP: "Plain HTML / CSS / JavaScript. No frameworks or external dependencies — all logic is inlined in one file.",
+        ossNote: "Issues and new network inspection ideas are welcome.",
         searchPlaceholder: "Enter IPv4 / IPv6, or leave blank for current IP...",
         btnQuery: "Lookup",
         btnMyIp: "My IP",
@@ -1586,7 +1889,20 @@
         mapHl: "ja",
         navHome: "ホーム",
         officialLink: "IPinfo",
+        navOss: "オープンソース",
         mobileLangTitle: "言語",
+        ossPanelTitle: "オープンソース情報",
+        authorRole: "作者 / メンテナー",
+        authorProfile: "GitHub",
+        authorRepo: "リポジトリ",
+        authorIssues: "Issues",
+        ossAboutH: "プロジェクトについて",
+        ossAboutP: "単一ファイルの静的 IP・ネットワーク属性ダッシュボード。依存関係・ビルド不要、トークン露出ゼロで動作します。",
+        ossRepoH: "リポジトリ",
+        ossLicenseH: "ライセンス",
+        ossStackH: "技術スタック",
+        ossStackP: "ネイティブ HTML / CSS / JavaScript のみで構成され、すべて単一ファイルにインライン化されています。",
+        ossNote: "不具合の報告や新しい検出項目の提案は Issue までお寄せください。",
         searchPlaceholder: "IPv4 / IPv6 を入力（空欄で現在のIP）...",
         btnQuery: "検索",
         btnMyIp: "現在IP",
@@ -1656,6 +1972,115 @@
       return (I18N[currentLang] && I18N[currentLang][key]) || I18N.zh[key] || key;
     }
 
+    function escHtml(s) {
+      return String(s == null ? "" : s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    /* ================= 开源菜单面板逻辑（移植自 BzStream） ================= */
+    function buildOssPanelHtml() {
+      const a = PROJECT.author || {};
+      const initial = escHtml(String(a.name || "S").trim().charAt(0).toUpperCase());
+      const links = [
+        {
+          href: a.profile,
+          label: t("authorProfile"),
+          icon: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.73.5.5 5.73.5 12c0 5.08 3.29 9.39 7.86 10.91.58.11.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.2.7-3.88-1.54-3.88-1.54-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.71.08-.71 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.23-1.28-5.23-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .96-.31 3.15 1.18a11 11 0 0 1 2.87-.39c.97 0 1.95.13 2.87.39 2.18-1.49 3.14-1.18 3.14-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.43-2.69 5.41-5.25 5.69.41.36.78 1.06.78 2.14 0 1.55-.01 2.8-.01 3.18 0 .31.21.67.8.56A11 11 0 0 0 23.5 12C23.5 5.73 18.27.5 12 .5z"/></svg>`
+        },
+        {
+          href: PROJECT.repo,
+          label: t("authorRepo"),
+          icon: `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7.4 6.3 3.8 10l3.6 3.7"/><path d="M12.6 6.3 16.2 10l-3.6 3.7"/></svg>`
+        },
+        {
+          href: PROJECT.issues,
+          label: t("authorIssues"),
+          icon: `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8.4 11.6a3.2 3.2 0 0 0 4.5 0l2.4-2.4a3.2 3.2 0 0 0-4.5-4.5l-1 1"/><path d="M11.6 8.4a3.2 3.2 0 0 0-4.5 0l-2.4 2.4a3.2 3.2 0 0 0 4.5 4.5l1-1"/></svg>`
+        }
+      ].filter((item) => Boolean(item.href));
+
+      return `
+        <div class="oss-author">
+          <div class="oss-author-avatar">
+            <span>${initial}</span>
+            ${a.avatar ? `<img data-oss-avatar src="${escHtml(a.avatar)}" alt="${escHtml(a.name)}" loading="lazy" decoding="async">` : ""}
+          </div>
+          <div class="oss-author-meta">
+            <div class="oss-author-name">${escHtml(a.name)}</div>
+            <div class="oss-author-role">${t("authorRole")}</div>
+          </div>
+        </div>
+        <div class="oss-author-links">
+          ${links.map((l) => `
+            <a class="oss-author-link" href="${escHtml(l.href)}" target="_blank" rel="noopener noreferrer">
+              ${l.icon}
+              <span>${l.label}</span>
+            </a>
+          `).join("")}
+        </div>
+        <h4>${t("ossAboutH")}</h4>
+        <p>${t("ossAboutP")}</p>
+        <h4>${t("ossRepoH")}</h4>
+        <a class="oss-repo-link" href="${escHtml(PROJECT.repo)}" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8.4 11.6a3.2 3.2 0 0 0 4.5 0l2.4-2.4a3.2 3.2 0 0 0-4.5-4.5l-1 1"/><path d="M11.6 8.4a3.2 3.2 0 0 0-4.5 0l-2.4 2.4a3.2 3.2 0 0 0 4.5 4.5l1-1"/></svg>
+          <span>${escHtml(PROJECT.repo)}</span>
+        </a>
+        <h4>${t("ossLicenseH")}</h4>
+        <div class="oss-kv"><span>${t("ossLicenseH")}</span><span>${escHtml(PROJECT.license)}</span></div>
+        <div class="oss-kv"><span>Version</span><span>${escHtml(PROJECT.version)}</span></div>
+        <div class="oss-kv"><span>Issues</span><span>${escHtml(PROJECT.issues.replace(/^https?:\/\//, ""))}</span></div>
+        <h4>${t("ossStackH")}</h4>
+        <p>${t("ossStackP")}</p>
+        <p>${t("ossNote")}</p>
+      `;
+    }
+
+    function bindOssAvatarFallback() {
+      const img = $("ossPanelBody").querySelector("[data-oss-avatar]");
+      if (!img) return;
+      const list = [PROJECT.author.avatar]
+        .concat(PROJECT.author.avatarFallbacks || [])
+        .filter(Boolean);
+      let idx = 0;
+      function tryNext() {
+        idx++;
+        if (idx < list.length) {
+          img.src = list[idx];
+        } else if (img.parentNode) {
+          img.parentNode.removeChild(img);
+        }
+      }
+      img.addEventListener("error", tryNext);
+      if (img.complete && img.naturalWidth === 0) tryNext();
+    }
+
+    function openOssPanel() {
+      closeLangMenu();
+      $("ossPanelTitle").textContent = t("ossPanelTitle");
+      $("ossPanelBody").innerHTML = buildOssPanelHtml();
+      bindOssAvatarFallback();
+      $("ossBackdrop").classList.add("show");
+      $("ossPanel").classList.add("show");
+      $("ossPanel").setAttribute("aria-hidden", "false");
+    }
+
+    function closeOssPanel() {
+      $("ossBackdrop").classList.remove("show");
+      $("ossPanel").classList.remove("show");
+      $("ossPanel").setAttribute("aria-hidden", "true");
+    }
+
+    function toggleOssPanel() {
+      if ($("ossPanel").classList.contains("show")) {
+        closeOssPanel();
+      } else {
+        openOssPanel();
+      }
+    }
+
     function updateGoogleMap(lat, lng) {
       const validLat = Number.isFinite(lat) ? lat : 37.35411;
       const validLng = Number.isFinite(lng) ? lng : -121.95524;
@@ -1677,6 +2102,7 @@
 
     // 移动端抽屉菜单与二级语言收纳盒控制
     function toggleMobileMenu() {
+      closeOssPanel();
       const isOpen = $("mobileScreen").classList.toggle("open");
       if (!isOpen) {
         collapseMobileLangBox();
@@ -1711,6 +2137,7 @@
     // 桌面端语言下拉菜单控制
     function toggleLangMenu(event) {
       event.stopPropagation();
+      closeOssPanel();
       const menu = $("langMenu");
       const btn = $("langTriggerBtn");
       const isOpen = menu.classList.toggle("open");
@@ -1732,6 +2159,7 @@
       if (e.key === "Escape") {
         closeLangMenu();
         closeMobileMenu();
+        closeOssPanel();
       }
     });
 
@@ -1778,6 +2206,10 @@
       currentLang = lang;
       localStorage.setItem("ip_inspector_lang", lang);
       applyLanguageUI();
+      if ($("ossPanel").classList.contains("show")) {
+        $("ossPanelBody").innerHTML = buildOssPanelHtml();
+        bindOssAvatarFallback();
+      }
       updateGoogleMap(currentCoords.lat, currentCoords.lng);
       renderIpv6Status();
       if (lastMergedData) {
