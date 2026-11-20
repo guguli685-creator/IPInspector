@@ -117,7 +117,7 @@
       overflow-y: scroll;
     }
 
-    /* VitePress 极简风格固定顶部菜单栏 */
+    /* VitePress 极简风格固定顶部菜单栏 - PC全屏流式铺满 */
     header {
       position: fixed;
       top: 0;
@@ -131,10 +131,10 @@
     }
 
     .nav-container {
-      max-width: 1120px;
-      margin: 0 auto;
+      width: 100%;
+      max-width: 100%;
       height: 100%;
-      padding: 0 16px;
+      padding: 0 28px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -221,14 +221,7 @@
     }
 
     #langTriggerBtn {
-      min-width: 96px;
-      justify-content: space-between;
-    }
-
-    #currentLangLabel {
-      display: inline-block;
-      text-align: center;
-      flex: 1;
+      padding: 0 10px;
     }
 
     .nav-icon-btn:hover,
@@ -385,7 +378,7 @@
       align-items: center;
     }
 
-    /* 移动端语言设置一级可折叠收纳盒（纯文字简洁样式，无左侧图标） */
+    /* 移动端语言设置一级可折叠收纳盒 */
     .mobile-lang-accordion {
       border-bottom: 1px solid var(--border-light);
     }
@@ -482,19 +475,21 @@
     }
 
     @media (max-width: 600px) {
+      .nav-container { padding: 0 16px; }
       .nav-menu { display: none; }
       .desktop-lang { display: none; }
       .hamburger { display: flex; }
     }
 
-    /* 主容器 */
+    /* 主容器 - PC 全屏铺满 */
     .container {
-      max-width: 1120px;
+      width: 100%;
+      max-width: 100%;
       margin: 0 auto;
-      padding: calc(var(--vp-nav-height) + 20px) 16px 48px;
+      padding: calc(var(--vp-nav-height) + 20px) 28px 40px;
     }
 
-    /* 搜索工具栏 */
+    /* 顶部融合栏：PC 端支持搜索栏与状态胶囊同屏高效利用宽度 */
     .toolbar {
       display: flex;
       gap: 12px;
@@ -504,7 +499,7 @@
 
     .search-box {
       flex: 1;
-      min-width: 240px;
+      min-width: 260px;
       position: relative;
       display: flex;
       align-items: center;
@@ -550,7 +545,7 @@
 
     .btn {
       height: 44px;
-      min-width: 104px;
+      min-width: 108px;
       padding: 0 18px;
       border-radius: var(--radius-lg);
       font-size: 14px;
@@ -597,7 +592,7 @@
       background: var(--bg-card);
       border: 1px solid var(--border-light);
       border-radius: var(--radius-xl);
-      padding: 24px;
+      padding: 22px 24px;
       box-shadow: var(--shadow-sm);
       margin-bottom: 18px;
       transition: background-color 0.25s ease, border-color 0.25s ease;
@@ -612,7 +607,7 @@
       font-weight: 500;
       color: var(--text-tertiary);
       font-family: var(--font-mono);
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       flex-wrap: wrap;
     }
 
@@ -623,23 +618,30 @@
     .hero-header {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
+      align-items: center;
       gap: 16px;
       flex-wrap: wrap;
-      padding-bottom: 20px;
+      padding-bottom: 18px;
       border-bottom: 1px solid var(--border-light);
+    }
+
+    .hero-ip-block {
+      display: flex;
+      align-items: baseline;
+      gap: 20px;
+      flex-wrap: wrap;
     }
 
     .ip-display-row {
       display: flex;
       align-items: center;
       gap: 12px;
-      min-height: 46px;
+      min-height: 44px;
       flex-wrap: wrap;
     }
 
     .ip-number {
-      font-size: clamp(26px, 4.5vw, 38px);
+      font-size: clamp(26px, 3vw, 36px);
       font-weight: 700;
       line-height: 1.15;
       letter-spacing: -0.02em;
@@ -672,7 +674,6 @@
     }
 
     .ipv6-subline {
-      margin-top: 8px;
       min-height: 22px;
       font-size: 13px;
       line-height: 1.4;
@@ -747,15 +748,15 @@
 
     /* 概览 5 指标速览 */
     .hero-meta {
-      padding-top: 18px;
+      padding-top: 16px;
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      gap: 12px;
+      gap: 14px;
     }
 
     .meta-box {
-      min-height: 92px;
-      padding: 14px;
+      min-height: 86px;
+      padding: 13px 16px;
       border-radius: var(--radius-lg);
       background: var(--bg-subtle);
       border: 1px solid var(--border-light);
@@ -825,36 +826,39 @@
       transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.3s ease;
     }
 
-    /* 主体双栏网格 */
+    /* PC 宽屏三栏 Dashboard 网格：彻底铺满全屏并消除纵向冗余滚动 */
     .main-grid {
       display: grid;
-      grid-template-columns: 1.05fr 0.95fr;
+      grid-template-columns: 1fr 1fr 1.25fr;
       gap: 18px;
-      align-items: start;
+      align-items: stretch;
     }
 
     .card {
       background: var(--bg-card);
       border: 1px solid var(--border-light);
       border-radius: var(--radius-xl);
-      padding: 22px;
+      padding: 20px 22px;
       box-shadow: var(--shadow-sm);
       transition: background-color 0.25s ease, border-color 0.25s ease;
+      display: flex;
+      flex-direction: column;
     }
 
     .card-title {
       font-size: 15px;
       font-weight: 700;
       line-height: 1.3;
-      min-height: 34px;
+      min-height: 32px;
       color: var(--text-primary);
-      margin-bottom: 14px;
-      padding-bottom: 12px;
+      margin-bottom: 12px;
+      padding-bottom: 11px;
       border-bottom: 1px solid var(--border-light);
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
+      flex-shrink: 0;
     }
 
     .card-title > span:first-child {
@@ -876,16 +880,18 @@
     .summary-list {
       display: flex;
       flex-direction: column;
+      flex: 1;
+      justify-content: space-between;
     }
 
     .summary-row {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      gap: 16px;
-      padding: 12px 0;
+      gap: 14px;
+      padding: 10px 0;
       border-bottom: 1px solid var(--border-light);
-      font-size: 14px;
+      font-size: 13.5px;
       line-height: 1.45;
     }
 
@@ -902,7 +908,7 @@
       color: var(--text-tertiary);
       font-weight: 500;
       flex-shrink: 0;
-      min-width: 128px;
+      min-width: 118px;
       white-space: nowrap;
     }
 
@@ -928,19 +934,24 @@
       border: 1px solid var(--border-light);
       color: var(--text-primary);
       font-family: var(--font-mono);
-      font-size: 13px;
+      font-size: 12.5px;
       font-weight: 600;
       line-height: 1.3;
     }
 
-    /* 无广告完整 Google Maps 嵌入式容器 */
+    /* 右侧独立 Google Maps 实时地图卡片，自动撑满三栏等高 */
+    .map-card {
+      display: flex;
+      flex-direction: column;
+    }
+
     .map-wrapper {
       width: 100%;
-      height: 310px;
+      flex: 1;
+      min-height: 320px;
       border-radius: var(--radius-lg);
       overflow: hidden;
       border: 1px solid var(--border-light);
-      margin-bottom: 16px;
       position: relative;
       background: var(--bg-subtle);
     }
@@ -985,7 +996,7 @@
     }
 
     .raw-header {
-      padding: 15px 22px;
+      padding: 14px 22px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -1019,20 +1030,33 @@
     }
 
     .footer-note {
-      margin-top: 24px;
+      margin-top: 20px;
       text-align: center;
       font-size: 12px;
       color: var(--text-tertiary);
       line-height: 1.6;
     }
 
-    /* 移动端响应式适配 */
+    /* 中等屏幕（1024px - 1279px）双栏自适应 */
+    @media (max-width: 1279px) {
+      .main-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .map-card {
+        grid-column: 1 / -1;
+      }
+      .map-wrapper {
+        min-height: 300px;
+      }
+    }
+
     @media (max-width: 960px) {
       .hero-meta {
         grid-template-columns: repeat(3, 1fr);
       }
     }
 
+    /* 移动端响应式适配 */
     @media (max-width: 840px) {
       .container {
         padding: calc(var(--vp-nav-height) + 14px) 14px 36px;
@@ -1067,6 +1091,11 @@
         padding-bottom: 16px;
       }
 
+      .hero-ip-block {
+        flex-direction: column;
+        gap: 6px;
+      }
+
       .hero-meta {
         padding-top: 16px;
         grid-template-columns: repeat(2, 1fr);
@@ -1078,11 +1107,16 @@
         gap: 14px;
       }
 
+      .map-card {
+        grid-column: auto;
+      }
+
       .card {
         padding: 18px;
       }
 
       .map-wrapper {
+        min-height: 250px;
         height: 250px;
       }
 
@@ -1132,12 +1166,9 @@
         </nav>
 
         <div class="nav-actions">
-          <!-- 桌面端自定义语言下拉 -->
+          <!-- 桌面端自定义语言下拉：纯文字化繁为简 -->
           <div class="dropdown desktop-lang" id="langDropdown">
-            <button type="button" class="nav-icon-btn" id="langTriggerBtn" aria-haspopup="listbox" aria-expanded="false" onclick="toggleLangMenu(event)" aria-label="Language">
-              <svg viewBox="0 0 24 24"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
-              <span id="currentLangLabel">简体中文</span>
-            </button>
+            <button type="button" class="nav-icon-btn" id="langTriggerBtn" aria-haspopup="listbox" aria-expanded="false" onclick="toggleLangMenu(event)" aria-label="Language" data-i18n="mobileLangTitle">语言</button>
 
             <div class="dropdown-menu" id="langMenu" role="listbox">
               <button type="button" class="dropdown-item active" data-lang="zh" onclick="selectLanguage('zh')">
@@ -1241,7 +1272,7 @@
       </div>
 
       <div class="hero-header">
-        <div>
+        <div class="hero-ip-block">
           <div class="ip-display-row">
             <span id="ipValue" class="ip-number">--</span>
             <button class="copy-btn" onclick="copyIp()" id="copyBtn">
@@ -1296,9 +1327,9 @@
       </div>
     </section>
 
-    <!-- 核心双栏：左侧完整 Summary 表格 + 右侧无广告 Google Maps 实时地图 -->
+    <!-- PC 宽屏三栏 Dashboard：左栏网络与归属摘要 + 中栏风控网段与地理明细 + 右栏全高 Google Maps 实时定位 -->
     <section class="main-grid">
-      <!-- 左侧：完整 Summary 信息卡片 -->
+      <!-- 第一栏：核心网络摘要 -->
       <div class="card">
         <h2 class="card-title">
           <span data-i18n="cardSummaryTitle">Summary · 网络摘要</span>
@@ -1311,16 +1342,16 @@
             <span id="sumPurity" class="summary-val">--</span>
           </div>
           <div class="summary-row">
-            <span class="summary-key">Location</span>
-            <span id="sumLocation" class="summary-val">--</span>
-          </div>
-          <div class="summary-row">
             <span class="summary-key">ASN</span>
             <span id="sumAsn" class="summary-val">--</span>
           </div>
           <div class="summary-row">
             <span class="summary-key">AS Type</span>
             <span id="sumAsType" class="summary-val">--</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-key">Company</span>
+            <span id="sumCompany" class="summary-val">--</span>
           </div>
           <div class="summary-row">
             <span class="summary-key">Hostname</span>
@@ -1331,20 +1362,8 @@
             <span id="sumRange" class="summary-val mono">--</span>
           </div>
           <div class="summary-row">
-            <span class="summary-key">Company</span>
-            <span id="sumCompany" class="summary-val">--</span>
-          </div>
-          <div class="summary-row">
             <span class="summary-key">Hosted domains</span>
             <span id="sumHostedDomains" class="summary-val mono">0</span>
-          </div>
-          <div class="summary-row">
-            <span class="summary-key">Privacy</span>
-            <span id="sumPrivacy" class="summary-val mono">--</span>
-          </div>
-          <div class="summary-row">
-            <span class="summary-key">Anycast</span>
-            <span id="sumAnycast" class="summary-val mono">--</span>
           </div>
           <div class="summary-row">
             <span class="summary-key">Abuse contact</span>
@@ -1353,25 +1372,18 @@
         </div>
       </div>
 
-      <!-- 右侧：Google Maps 完整无广告地图与详细地理信息 -->
+      <!-- 第二栏：地理位置与风控特征明细 -->
       <div class="card">
         <h2 class="card-title">
-          <span data-i18n="cardGeoTitle">Google Maps · 实时定位</span>
-          <a id="externalMapLink" class="map-link" href="https://www.google.com/maps/@37.35411,-121.95524,10z?hl=zh-CN" target="_blank" rel="noopener noreferrer" style="font-size: 13px;" data-i18n="externalMap">Google Maps ↗</a>
+          <span data-i18n="cardDetailTitle">Geolocation · 地理与风控</span>
+          <span class="card-subtitle">Precision</span>
         </h2>
 
-        <div class="map-wrapper">
-          <iframe
-            id="googleMapFrame"
-            src="https://maps.google.com/maps?q=37.35411,-121.95524&hl=zh-CN&z=11&output=embed"
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade"
-            allowfullscreen
-            title="Google Maps Location"
-          ></iframe>
-        </div>
-
         <div class="summary-list">
+          <div class="summary-row">
+            <span class="summary-key">Location</span>
+            <span id="sumLocation" class="summary-val">--</span>
+          </div>
           <div class="summary-row">
             <span class="summary-key" data-i18n="geoCountryLabel">国家 / 地区</span>
             <span id="geoCountry" class="summary-val">--</span>
@@ -1396,6 +1408,33 @@
             <span class="summary-key" data-i18n="geoTzLabel">时区对比</span>
             <span id="geoTimezone" class="summary-val">--</span>
           </div>
+          <div class="summary-row">
+            <span class="summary-key">Privacy</span>
+            <span id="sumPrivacy" class="summary-val mono">--</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-key">Anycast</span>
+            <span id="sumAnycast" class="summary-val mono">--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 第三栏：Google Maps 完整无广告地图（全高铺满） -->
+      <div class="card map-card">
+        <h2 class="card-title">
+          <span data-i18n="cardGeoTitle">Google Maps · 实时定位</span>
+          <a id="externalMapLink" class="map-link" href="https://www.google.com/maps/@37.35411,-121.95524,10z?hl=zh-CN" target="_blank" rel="noopener noreferrer" style="font-size: 13px;" data-i18n="externalMap">Google Maps ↗</a>
+        </h2>
+
+        <div class="map-wrapper">
+          <iframe
+            id="googleMapFrame"
+            src="https://maps.google.com/maps?q=37.35411,-121.95524&hl=zh-CN&z=11&output=embed"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            allowfullscreen
+            title="Google Maps Location"
+          ></iframe>
         </div>
       </div>
     </section>
@@ -1455,6 +1494,7 @@
         metaPrivacy: "风控特征",
         cardSummaryTitle: "Summary · 网络摘要",
         cardSummarySub: "ipinfo.io",
+        cardDetailTitle: "Geolocation · 地理与风控",
         cardGeoTitle: "Google Maps · 实时定位",
         externalMap: "Google Maps ↗",
         geoCountryLabel: "国家 / 地区",
@@ -1515,6 +1555,7 @@
         metaPrivacy: "Risk Flags",
         cardSummaryTitle: "Summary · Network",
         cardSummarySub: "ipinfo.io",
+        cardDetailTitle: "Geolocation · Risk",
         cardGeoTitle: "Google Maps · Location",
         externalMap: "Google Maps ↗",
         geoCountryLabel: "Country",
@@ -1575,6 +1616,7 @@
         metaPrivacy: "リスク判定",
         cardSummaryTitle: "Summary · 概要",
         cardSummarySub: "ipinfo.io",
+        cardDetailTitle: "Geolocation · 地理・リスク",
         cardGeoTitle: "Google Maps · 位置",
         externalMap: "Google Maps ↗",
         geoCountryLabel: "国 / 地域",
@@ -1745,7 +1787,6 @@
 
     function applyLanguageUI() {
       document.documentElement.lang = t("localeCode");
-      $("currentLangLabel").textContent = t("langName");
       $("mobileCurrentLangLabel").textContent = t("langName");
       $("ipInput").placeholder = t("searchPlaceholder");
 
